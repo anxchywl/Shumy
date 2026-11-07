@@ -1,0 +1,9 @@
+{
+  "name": "kto-iz-nas",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Party game «Кто из нас» — TV screen + phones over local Wi-Fi",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "dependencies": { "qrcode": "^1.5.4" }
+}
