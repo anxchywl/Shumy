@@ -1,0 +1,630 @@
+<!doctype html>
+<html lang="ru" data-game-mode="vote">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f9f8f4">
+<title>Кто из нас? Вход в игру</title>
+<link rel="icon" href="data:,">
+<script>
+const languageParameters = new URLSearchParams(location.search);
+const requestedLocale = languageParameters.get('lang') || languageParameters.get('shumyLang');
+const playerLocale = ['ru', 'en', 'kk'].includes(requestedLocale) ? requestedLocale : 'ru';
+document.documentElement.lang = playerLocale;
+if (languageParameters.get('shumyEmbed') === 'player') document.documentElement.dataset.embed = 'player';
+</script>
+<script src="./theme.js?v=15"></script>
+<link rel="stylesheet" href="./theme.css?v=10">
+<link rel="stylesheet" href="./drawing.css">
+<style>
+  * { box-sizing:border-box; }
+  [hidden] { display:none !important; }
+  body {
+    margin:0; min-height:100vh; min-height:100dvh; line-height:1.5;
+    background-color:var(--bg);
+  }
+  main { position:relative; z-index:1; display:flex; flex-direction:column; justify-content:center; width:min(100%, 72rem); min-height:100vh; min-height:100dvh; margin:auto; padding:clamp(1.25rem, 3vw, 2.75rem); }
+  header { display:flex; align-items:center; gap:.75rem; padding-bottom:.9rem; margin-bottom:clamp(1.25rem, 3vw, 2rem); border-bottom:1px solid var(--edge); transition:border-color var(--theme-duration) var(--theme-ease); }
+  .brand { color:var(--text); font-size:1.15rem; font-weight:850; letter-spacing:-.035em; text-decoration:none; }
+  .game-name { margin-left:auto; color:var(--muted); font-size:.92rem; font-weight:700; text-align:right; }
+  .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+  .muted, .eyebrow { color:var(--muted); }
+  .eyebrow { font-size:.875rem; font-weight:800; }
+  h1 { margin:.25rem 0 .75rem; font-size:clamp(1.85rem, 8vw, 2.6rem); font-weight:800; line-height:1.1; letter-spacing:-.04em; }
+  p { margin:.5rem 0 1rem; }
+  h1, .pill, button { overflow-wrap:anywhere; }
+  #error { color:var(--danger); font-weight:650; }
+  #error:empty { display:none; }
+  #join { display:grid; grid-template-columns:minmax(0, .9fr) minmax(20rem, 1.1fr); grid-template-areas:"art form" "kicker form" "title form" "copy form"; align-content:center; align-items:center; column-gap:clamp(2rem, 6vw, 5rem); row-gap:.35rem; width:min(100%, 56rem); margin:0 auto; padding:clamp(1.5rem, 4vw, 3rem); border:1px solid var(--edge); border-radius:1.8rem; background:linear-gradient(155deg,rgba(255,255,255,.22),transparent 42%),var(--surface); box-shadow:0 1.25rem 3.5rem rgba(48,52,47,.12); transition:background-color var(--theme-duration) var(--theme-ease),border-color var(--theme-duration) var(--theme-ease),box-shadow var(--theme-duration) var(--theme-ease); }
+  .join-art { grid-area:art; display:grid; place-items:center; width:6.5rem; height:6rem; margin:0 auto .1rem; border:0; border-radius:0; background:none; }
+  .join-art svg { width:100%; height:100%; overflow:visible; fill:none; stroke-linecap:round; stroke-linejoin:round; stroke-width:3; }
+  .join-mascot { transform-origin:50% 65%; }
+  .mascot-body { fill:#ee9878; stroke:#30342f; }
+  .mascot-eye { fill:#30342f; stroke:none; }
+  .mascot-mouth,.mascot-limb { fill:none; stroke:#30342f; stroke-width:3.2; }
+  .mascot-scarf { fill:none; stroke:#3f7b7e; stroke-width:8; }
+  .mascot-spark { fill:#f3be63; stroke:#30342f; stroke-width:2.6; }
+  .mascot-pencil { fill:#e78362; stroke:#30342f; stroke-width:2.7; }
+  .join-art-draw { display:none; }
+  .join-kicker { grid-area:kicker; margin:0 0 .15rem; color:var(--accent); font-size:.8rem; font-weight:850; letter-spacing:.12em; text-align:center; text-transform:uppercase; }
+  #join h1 { grid-area:title; margin:.1rem 0 .35rem; }
+  #join form { grid-area:form; width:100%; margin:0; }
+  #join label { display:block; margin-bottom:.2rem; }
+  #join h1,.join-copy { text-align:center; }
+  .join-copy { grid-area:copy; max-width:25rem; margin:0 auto; }
+  form, .choices { display:grid; gap:.75rem; margin-top:1.5rem; }
+  label { font-weight:800; }
+  input, button { width:100%; min-height:3.5rem; padding:.75rem 1rem; border:1px solid var(--edge); border-radius:.8rem; font:inherit; }
+  input, .choices button { color:var(--text); background:var(--surface); }
+  input { transition:border-color .18s ease,box-shadow .18s ease,background-color var(--theme-duration) var(--theme-ease),color var(--theme-duration) var(--theme-ease); }
+  input:focus { border-color:var(--accent); background:var(--surface); box-shadow:0 0 0 4px var(--accent-soft); outline:none; }
+  button { color:var(--action-ink); background:var(--accent); font-weight:800; cursor:pointer; transition:transform .18s ease,filter .18s ease,box-shadow .18s ease,background-color var(--theme-duration) var(--theme-ease),color var(--theme-duration) var(--theme-ease); }
+  button:enabled:hover { filter:brightness(1.06); transform:translateY(-2px); box-shadow:0 5px 0 rgba(0,0,0,.22); }
+  button:enabled:active { transform:translateY(1px); box-shadow:none; }
+  button:disabled { opacity:.55; cursor:default; }
+  #roomInput { text-transform:uppercase; letter-spacing:.2em; font-weight:800; }
+  #joinButton, #roomButton { display:flex; align-items:center; justify-content:center; gap:.7rem; min-height:3.75rem; border:0; border-radius:1rem; box-shadow:0 4px 0 var(--action-shadow); }
+  #joinButton:disabled { box-shadow:none; }
+  #joinButton .icon { transition:transform .18s ease; }
+  #joinButton:hover .icon { transform:translateX(3px); }
+  .icon { width:1.15em; height:1.15em; flex:none; vertical-align:middle; }
+  main > section:not([hidden]) { animation:screen-arrive .38s cubic-bezier(.2,.75,.25,1) both; }
+  @keyframes screen-arrive { from { opacity:0; transform:translateY(12px) scale(.99); } to { opacity:1; transform:none; } }
+  .choices button { display:flex; align-items:center; gap:.65rem; text-align:left; }
+  .choices button:enabled:is(:hover, :active) { border-color:var(--player); }
+  .choices small { margin-left:auto; flex-shrink:0; font-weight:700; }
+  .roster { display:flex; flex-wrap:wrap; gap:.65rem; padding:0; margin:1rem 0; list-style:none; }
+  .pill { display:inline-flex; align-items:center; gap:.5rem; padding:.45rem .85rem; border-radius:.4rem; background:var(--surface); border:1px solid var(--edge); font-weight:650; }
+  .pill.off { opacity:.65; }
+  .card { background:var(--surface); border:1px solid var(--edge); padding:1.15rem; border-radius:1rem; margin-top:1.25rem; transition:background-color var(--theme-duration) var(--theme-ease),border-color var(--theme-duration) var(--theme-ease); }
+  .card p:last-child { margin-bottom:0; }
+  .score { font-size:2.6rem; font-weight:750; line-height:1; }
+  #voted .icon { color:var(--accent); margin-right:.3rem; }
+  .sketch-top { display:flex; justify-content:space-between; align-items:center; gap:.5rem; }
+  .sketch-title { font-size:clamp(1.35rem, 6vw, 2rem); }
+  .sketch-board { margin:.8rem 0; }
+  .sketch-board.editable { touch-action:none; cursor:crosshair; }
+  .brush-tools { display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; }
+  .brush-tools button { width:auto; min-height:2.75rem; min-width:2.75rem; padding:.35rem .65rem; background:var(--surface); color:var(--text); }
+  .brush-tools button[aria-pressed="true"] { border-color:var(--accent); }
+  .palette { display:flex; flex-wrap:wrap; gap:.35rem; }
+  .palette button { display:grid; place-items:center; padding:0; }
+  .palette span { width:1.3rem; height:1.3rem; border-radius:50%; border:1px solid #8b8c7b; background:var(--brush); }
+  .draw-form { grid-template-columns:minmax(0, 1fr) auto; gap:.5rem; margin-top:.8rem; }
+  .draw-form label { grid-column:1 / -1; }
+  .draw-form input { min-width:0; }
+  .draw-form button { width:auto; padding:.6rem .75rem; }
+  #guessFeedback { min-height:1.5em; }
+  html[data-game-mode="draw"] .join-art-vote { display:none; }
+  html[data-game-mode="draw"] .join-art-draw { display:block; }
+  html[data-game-mode="draw"] .join-kicker { letter-spacing:.08em; }
+  html[data-game-mode="draw"] #join { background-image:linear-gradient(155deg,rgba(255,255,255,.35),transparent 42%),repeating-linear-gradient(0deg,transparent 0 31px,rgba(63,123,126,.035) 31px 32px),var(--surface); }
+  @media (max-width:44rem) {
+    main { justify-content:flex-start; width:min(100%, 34rem); padding:1rem 1rem 2rem; }
+    header { margin-bottom:clamp(.75rem, 3vh, 1.25rem); }
+    #join { display:block; width:100%; padding:clamp(1.1rem, 5vw, 1.6rem); border-radius:1.35rem; }
+    .join-art { width:4.25rem; height:4rem; margin:0 auto .35rem; }
+    #join h1,.join-copy { text-align:center; }
+    #join form { margin-top:1.4rem; }
+    #join label { margin-bottom:0; }
+    .drifters { display:none; }
+  }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; } }
+  html[data-embed="player"] body { overflow:hidden; }
+  /* inside the shumy dialog the page sits on the dialog paper */
+  html[data-embed], html[data-embed] body { background:transparent; background-image:none; }
+  html[data-embed] .drifters { display:none; }
+  html[data-embed="player"] #join input { border:2.5px solid var(--text); border-radius:14px; background:var(--surface); }
+  html[data-embed="player"] #roomButton,
+  html[data-embed="player"] #joinButton { border:2.5px solid #1f3a30; border-radius:14px; background:#3d6c5b; color:#fff; box-shadow:4px 4px 0 #1f3a30; }
+  html[data-embed="player"] #joinButton:hover { transform:translate(-2px,-2px); box-shadow:6px 6px 0 #1f3a30; filter:none; }
+  html[data-embed="player"] #joinButton:active { transform:translate(3px,3px); box-shadow:1px 1px 0 #1f3a30; }
+  html[data-embed="player"] .drifters,
+  html[data-embed="player"] header,
+  html[data-embed="player"] .join-art,
+  html[data-embed="player"] .join-kicker,
+  html[data-embed="player"] #join h1,
+  html[data-embed="player"] .join-copy { display:none; }
+  html[data-embed="player"] main { justify-content:center; width:100%; min-height:100vh; min-height:100dvh; padding:.5rem; }
+  html[data-embed="player"] #join { display:block; width:100%; max-width:30rem; margin:auto; padding:.75rem; border:0; border-radius:0; background:none; box-shadow:none; }
+  html[data-embed="player"] #join form { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:.55rem .65rem; margin:0; }
+  html[data-embed="player"] #join label { grid-column:1 / -1; margin:0; font-size:.9rem; }
+  html[data-embed="player"] #join input { min-width:0; min-height:3.15rem; padding:.6rem .8rem; }
+  html[data-embed="player"] #roomButton,
+  html[data-embed="player"] #joinButton { width:auto; min-width:8rem; min-height:3.15rem; padding:.55rem .85rem; border-radius:.8rem; white-space:nowrap; }
+  html[data-embed="player"] #error { max-width:30rem; margin:.1rem auto .5rem; padding:0 .75rem; font-size:.9rem; }
+  @media (max-width:28rem) {
+    html[data-embed="player"] #join form { grid-template-columns:minmax(0,1fr); }
+    html[data-embed="player"] #join label { grid-column:auto; }
+    html[data-embed="player"] #roomButton,
+    html[data-embed="player"] #joinButton { width:100%; }
+  }
+</style>
+</head>
+<body>
+<div class="drifters" aria-hidden="true">
+  <span style="--x:5%;--y:18%;--w:52px;--h:52px;--turn:-14deg;--color:#a9654b"><svg viewBox="0 0 80 80"><use href="./objects.svg#pencil"/></svg></span>
+  <span style="--x:88%;--y:10%;--w:44px;--h:44px;--turn:12deg;--color:#527b6a"><svg viewBox="0 0 80 80"><use href="./objects.svg#dice"/></svg></span>
+  <span style="--x:7%;--y:50%;--w:42px;--h:42px;--turn:-8deg;--color:#8e769d"><svg viewBox="0 0 80 80"><use href="./objects.svg#speech"/></svg></span>
+  <span style="--x:92%;--y:43%;--w:44px;--h:44px;--turn:10deg;--color:#a9654b"><svg viewBox="0 0 80 80"><use href="./objects.svg#cards"/></svg></span>
+  <span style="--x:4%;--y:82%;--w:48px;--h:48px;--turn:14deg;--color:#527b6a"><svg viewBox="0 0 80 80"><use href="./objects.svg#question"/></svg></span>
+  <span style="--x:91%;--y:83%;--w:46px;--h:46px;--turn:-12deg;--color:#8e769d"><svg viewBox="0 0 80 80"><use href="./objects.svg#star"/></svg></span>
+  <span style="--x:30%;--y:7%;--w:34px;--h:34px;--turn:8deg;--color:#3f7b7e"><svg viewBox="0 0 80 80"><use href="./objects.svg#note"/></svg></span>
+  <span style="--x:70%;--y:94%;--w:38px;--h:38px;--turn:-10deg;--color:#9c8245"><svg viewBox="0 0 80 80"><use href="./objects.svg#heart"/></svg></span>
+</div>
+<main>
+  <header>
+    <a class="brand" id="homeLink" href="https://anxchywl.dev/">Shumy</a>
+    <span class="game-name" id="gameBrand">Кто из нас?</span>
+    <span class="sr-only" id="connection" role="status" aria-live="polite">Подключаемся…</span>
+  </header>
+
+  <section id="join">
+    <div class="join-art" aria-hidden="true">
+      <svg class="join-art-vote" viewBox="0 0 180 170">
+        <g class="join-mascot">
+          <path class="mascot-limb" d="M62 119 55 145m60-26 10 25M49 84 34 93m95-12 14-12"/>
+          <path class="mascot-body" d="M43 69c-2-14 8-27 22-30 5-17 27-23 42-12 16-4 30 8 29 24 12 12 8 31-4 40 2 18-13 32-30 30-14 13-37 8-41-8-15-5-22-20-18-34Z"/>
+          <ellipse class="mascot-eye" cx="76" cy="72" rx="4" ry="6"/><ellipse class="mascot-eye" cx="106" cy="72" rx="4" ry="6"/>
+          <path class="mascot-mouth" d="M82 89c6 7 14 7 20 0"/>
+          <path class="mascot-scarf" d="M48 101c23 15 55 16 81 0"/>
+          <path class="mascot-limb" d="m60 105-12 11 19-3" stroke="#3f7b7e"/>
+          <path class="mascot-spark" d="M133 27h20a7 7 0 0 1 7 7v12a7 7 0 0 1-7 7h-10l-8 8 1-8h-3a7 7 0 0 1-7-7V34a7 7 0 0 1 7-7Z"/>
+        </g>
+      </svg>
+      <svg class="join-art-draw" viewBox="0 0 180 170">
+        <g class="join-mascot">
+          <path class="mascot-limb" d="M62 119 55 145m60-26 10 25M49 84 34 93m95-12 14-12"/>
+          <path class="mascot-body" d="M43 69c-2-14 8-27 22-30 5-17 27-23 42-12 16-4 30 8 29 24 12 12 8 31-4 40 2 18-13 32-30 30-14 13-37 8-41-8-15-5-22-20-18-34Z"/>
+          <ellipse class="mascot-eye" cx="76" cy="72" rx="4" ry="6"/><ellipse class="mascot-eye" cx="106" cy="72" rx="4" ry="6"/>
+          <path class="mascot-mouth" d="M82 89c6 7 14 7 20 0"/>
+          <path class="mascot-scarf" d="M48 101c23 15 55 16 81 0"/>
+          <path class="mascot-limb" d="m60 105-12 11 19-3" stroke="#3f7b7e"/>
+          <path class="mascot-limb" d="m129 82 15-10"/>
+          <path class="mascot-pencil" d="m147 47 9 7-23 30-13 7 3-13Z"/>
+          <path d="m120 91 13-7-10-8Z" fill="#fffaf1" stroke="#30342f" stroke-width="2.7"/>
+        </g>
+      </svg>
+    </div>
+    <p class="join-kicker" data-i18n="turn">Твоя очередь</p>
+    <h1 data-i18n="enterName">Введи имя</h1>
+    <p class="muted join-copy" data-i18n="nameVisible">Имя будет видно на общем экране.</p>
+    <form id="roomForm" hidden>
+      <label for="roomInput" data-i18n="roomCode">Код комнаты</label>
+      <input id="roomInput" name="room" maxlength="8" autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="go" pattern="[A-HJ-NP-Za-hj-np-z2-9]{8}" placeholder="ABCD2345" required>
+      <button id="roomButton"><span data-i18n="next">Дальше</span><svg class="icon" aria-hidden="true"><use href="./icons.svg#arrow"/></svg></button>
+    </form>
+    <form id="joinForm">
+      <label for="name" data-i18n="yourName">Твоё имя</label>
+      <input id="name" name="name" maxlength="16" autocomplete="nickname" enterkeyhint="go" required>
+      <button id="joinButton" disabled><span data-i18n="joinGame">Войти в игру</span><svg class="icon" aria-hidden="true"><use href="./icons.svg#arrow"/></svg></button>
+    </form>
+  </section>
+
+  <section id="lobby" hidden>
+    <h1>Ты в игре!</h1>
+    <p class="muted" id="lobbyMode"></p>
+    <ul class="roster" id="roster" aria-label="Игроки"></ul>
+  </section>
+
+  <section id="question" hidden>
+    <div class="eyebrow" id="round"></div>
+    <p class="muted">Кто из нас скорее всего…</p>
+    <h1 id="prompt"></h1>
+    <div class="choices" id="choices"></div>
+    <div class="card" id="voted" role="status" hidden>
+      <strong><svg class="icon" aria-hidden="true"><use href="./icons.svg#check"/></svg>Голос принят</strong>
+      <p class="muted">Ждём результаты раунда.</p>
+    </div>
+  </section>
+
+  <section id="reveal" hidden>
+    <div class="eyebrow" id="resultRound"></div>
+    <h1>Результат раунда</h1>
+    <p id="winners"></p>
+    <div class="card">
+      <span class="score" id="gained"></span>
+      <p id="roundTotal"></p>
+    </div>
+  </section>
+
+  <section id="sketch" hidden>
+    <div class="sketch-top"><span class="sketch-kicker" id="drawRound"></span><span class="sketch-clock" id="drawClock"></span></div>
+    <h1 class="sketch-title" id="drawHeading"></h1>
+    <div id="drawClue"></div>
+    <canvas class="sketch-board" id="drawCanvas" width="960" height="600" aria-label="Рисунок раунда"></canvas>
+    <div id="drawTools" hidden>
+      <div class="brush-tools palette" id="palette" aria-label="Цвет кисти"></div>
+      <div class="brush-tools" style="margin-top:.5rem">
+        <button type="button" id="drawWidth">Средняя кисть</button>
+        <button type="button" id="drawClear">Очистить</button>
+      </div>
+    </div>
+    <form class="draw-form" id="guessForm" hidden>
+      <label for="guessInput">Твоя догадка</label>
+      <input id="guessInput" maxlength="80" autocomplete="off" enterkeyhint="go" required>
+      <button id="guessButton">Угадать</button>
+    </form>
+    <p class="muted" id="guessFeedback" role="status"></p>
+  </section>
+
+  <section id="final" hidden>
+    <h1>Итоги</h1>
+    <div class="card">
+      <span class="score" id="place"></span>
+      <p id="finalScore"></p>
+    </div>
+    <p class="muted">Ведущий может запустить новую игру на ТВ.</p>
+  </section>
+  <p id="error" role="alert"></p>
+</main>
+<script src="./drawing-client.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const screens = document.querySelectorAll('main > section');
+const embedParameters = new URLSearchParams(location.search);
+const embeddedPlayer = embedParameters.get('shumyEmbed') === 'player';
+const embedParentOrigin = embedParameters.get('shumyParentOrigin') || location.origin;
+const copy = {
+  ru:{ game:'Кто из нас?', drawGame:'Рисуй и угадывай', turn:'Твоя очередь', enterName:'Введи имя', nameVisible:'Имя будет видно на общем экране.', roomCode:'Код комнаты', next:'Дальше', yourName:'Твоё имя', joinGame:'Войти в игру', joining:'Входим…', enterCode:'Введи код', codeVisible:'Код комнаты виден на экране ведущего.', invalidCode:'Введи 8 символов: буквы и цифры от 2 до 9', enterNameError:'Введи имя', noConnection:'Нет связи с сервером. Попробуй ещё раз.', connectionLost:'Восстанавливаем связь…', connecting:'Подключаемся…', connected:'На связи', lobbyTitle:'Ты в игре!', waiting:'Жди, пока ведущий начнёт игру.'},
+  en:{ game:'Who’s most likely?', drawGame:'Draw and guess', turn:'You’re up', enterName:'Enter your name', nameVisible:'Your name will appear on the shared screen.', roomCode:'Room code', next:'Continue', yourName:'Your name', joinGame:'Join game', joining:'Joining…', enterCode:'Enter room code', codeVisible:'Find the room code on the host screen.', invalidCode:'Enter 8 characters: letters and numbers 2–9', enterNameError:'Enter your name', noConnection:'Could not reach the server. Try again.', connectionLost:'Reconnecting…', connecting:'Connecting…', connected:'Connected', lobbyTitle:'You’re in!', waiting:'Wait for the host to start the game.'},
+  kk:{ game:'Кім көбірек?', drawGame:'Сурет сал да тап', turn:'Сенің кезегің', enterName:'Атыңды енгіз', nameVisible:'Атың ортақ экранда көрінеді.', roomCode:'Бөлме коды', next:'Жалғастыру', yourName:'Атың', joinGame:'Ойынға қосылу', joining:'Қосылып жатыр…', enterCode:'Бөлме кодын енгіз', codeVisible:'Бөлме коды жүргізуші экранында.', invalidCode:'8 таңба енгіз: әріптер және 2–9 сандары', enterNameError:'Атыңды енгіз', noConnection:'Серверге қосылмады. Қайталап көр.', connectionLost:'Қайта қосылып жатыр…', connecting:'Қосылып жатыр…', connected:'Қосылды', lobbyTitle:'Ойынға қосылдың!', waiting:'Жүргізушінің ойынды бастауын күт.'}
+}[playerLocale];
+const t = key => copy[key] ?? copy.ru[key] ?? key;
+document.querySelectorAll('[data-i18n]').forEach(element => { element.textContent = t(element.dataset.i18n); });
+$('gameBrand').textContent = t('game');
+$('lobby').querySelector('h1').textContent = playerLocale === 'en' ? 'You’re in!' : playerLocale === 'kk' ? 'Ойынға қосылдың!' : 'Ты в игре!';
+document.title = `${t('game')} · Shumy`;
+if (location.hostname === '127.0.0.1' || location.hostname === 'localhost') {
+  $('homeLink').href = `${location.protocol}//${location.hostname}:8080/`;
+}
+const stored = key => {
+  try { return localStorage.getItem(key); } catch { return null; }
+};
+const save = (key, value) => {
+  try { localStorage.setItem(key, value); } catch {}
+};
+const pid = stored('kto.pid') || (crypto.randomUUID?.() ??
+  Array.from(crypto.getRandomValues(new Uint8Array(16)), byte => byte.toString(16).padStart(2, '0')).join(''));
+save('kto.pid', pid);
+$('name').value = stored('kto.name') || '';
+const room = (embedParameters.get('room') || '').toUpperCase();
+const hasRoom = /^[A-HJ-NP-Z2-9]{8}$/.test(room);
+
+let state = null;
+let connected = false;
+let joining = false;
+let pendingVote = null;
+let screen = 'join';
+let embeddedJoinNotified = false;
+let optionsKey = '';
+// without a room code there is nothing to listen to yet, the sketch board still needs an event source
+const events = hasRoom ? new EventSource('./events?' + new URLSearchParams({ room, pid })) : new EventTarget();
+events.addEventListener('missing', () => {
+  events.close();
+  askForRoom(playerLocale === 'en' ? 'Room not found. Check the code on the host screen.' : playerLocale === 'kk' ? 'Бөлме табылмады. Жүргізуші экранындағы кодты тексер.' : 'Нет такой комнаты. Проверь код на экране ведущего');
+});
+const drawCanvas = $('drawCanvas');
+const drawBoard = Sketch.board(drawCanvas, events);
+const drawClock = Sketch.clock($('drawClock'));
+let drawTurn = null;
+let canDraw = false;
+let pointer = null;
+let lastPoint = null;
+let color = 0;
+let width = 11;
+let inkQueue = [];
+let inkBusy = false;
+let clearQueued = false;
+let guessPending = null;
+let guessFeedback = '';
+
+events.onmessage = event => {
+  state = JSON.parse(event.data);
+  document.documentElement.dataset.gameMode = state.mode === 'draw' ? 'draw' : 'vote';
+  const gameName = state.mode === 'draw' ? t('drawGame') : t('game');
+  $('gameBrand').textContent = gameName;
+  document.title = `${gameName} · Шуми`;
+  connected = true;
+  render();
+};
+events.onerror = () => {
+  connected = false;
+  render();
+};
+
+async function post(action, payload, signal) {
+  const response = await fetch('./api/' + action, {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json' },
+    body:JSON.stringify({ room, pid, ...payload }),
+    signal,
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.error || (playerLocale === 'en' ? 'Please try again' : playerLocale === 'kk' ? 'Қайталап көр' : 'Попробуй ещё раз'));
+  return result;
+}
+
+function playerDot(color) {
+  const dot = document.createElement('span');
+  dot.className = 'dot';
+  dot.style.setProperty('--player', color);
+  return dot;
+}
+
+function makePill(player) {
+  const pill = document.createElement('li');
+  pill.className = 'pill' + (player.online ? '' : ' off');
+  pill.append(playerDot(player.color), player.name + (player.id === state.selfId ? ' (ты)' : ''));
+  return pill;
+}
+
+const paletteNames = ['Чёрный', 'Красный', 'Жёлтый', 'Зелёный', 'Синий', 'Фиолетовый', 'Ластик'];
+for (const [index, name] of paletteNames.entries()) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.setAttribute('aria-label', name);
+  button.setAttribute('aria-pressed', String(index === color));
+  button.title = name;
+  const swatch = document.createElement('span');
+  swatch.style.setProperty('--brush', Sketch.colors[index]);
+  button.append(swatch);
+  button.onclick = () => {
+    color = index;
+    for (const [i, swatchButton] of [...$('palette').children].entries()) {
+      swatchButton.setAttribute('aria-pressed', String(i === index));
+    }
+  };
+  $('palette').append(button);
+}
+$('drawWidth').onclick = () => {
+  width = width === 11 ? 23 : width === 23 ? 5 : 11;
+  $('drawWidth').textContent = { 5: 'Тонкая кисть', 11: 'Средняя кисть', 23: 'Толстая кисть' }[width];
+};
+
+function renderDrawing(me) {
+  const turn = state.drawing;
+  const revealed = state.phase === 'draw-result';
+  if (drawTurn !== turn.id) {
+    drawTurn = turn.id;
+    inkQueue = [];
+    clearQueued = false;
+    pointer = null;
+    guessPending = null;
+    guessFeedback = '';
+    $('guessInput').value = '';
+  }
+  drawBoard.select(turn.id);
+  drawClock(state.remainingMs);
+  $('drawClock').hidden = revealed;
+  const artist = turn.artist === me.id;
+  const solved = turn.solved.includes(me.id);
+  const playing = state.drawRoute.some(player => player.id === me.id);
+  const artistName = state.drawRoute.find(player => player.id === turn.artist).name;
+  canDraw = artist && !revealed && connected;
+  $('drawRound').textContent = `Ход ${state.round} из ${state.totalRounds}`;
+  $('drawHeading').textContent = revealed ? turn.word : artist ? state.secretWord : `Рисует ${artistName}`;
+  $('drawClue').textContent = revealed ? 'Ответ' : artist ? 'Твоё секретное слово' : `${turn.category} / ${turn.mask}`;
+  $('drawClue').className = revealed || artist ? 'muted' : 'sketch-mask';
+  drawCanvas.classList.toggle('editable', canDraw);
+  $('drawTools').hidden = !artist || revealed;
+  $('drawClear').disabled = !canDraw || clearQueued;
+  $('guessForm').hidden = artist || revealed || solved || !playing;
+  $('guessButton').disabled = !connected || !!guessPending;
+  const gain = turn.gained[me.id] ?? 0;
+  $('guessFeedback').textContent = revealed ? `+${gain} очков за ход. Всего ${me.score}`
+    : artist ? 'Рисуй без букв и цифр'
+    : solved ? `Угадано! +${gain} очков`
+    : playing ? guessFeedback : 'Вступишь в следующей партии';
+}
+
+function addInk(event) {
+  const bounds = drawCanvas.getBoundingClientRect();
+  const x = Math.max(0, Math.min(960, Math.round((event.clientX - bounds.left) / bounds.width * 960)));
+  const y = Math.max(0, Math.min(600, Math.round((event.clientY - bounds.top) / bounds.height * 600)));
+  if (lastPoint?.[0] === x && lastPoint[1] === y) return;
+  const segment = [color, color === 6 ? 23 : width, ...(lastPoint ?? [x, y]), x, y];
+  lastPoint = [x, y];
+  if (inkQueue.length >= 576) return;
+  inkQueue.push(segment);
+  drawBoard.segment(segment);
+}
+drawCanvas.onpointerdown = event => {
+  if (!canDraw || clearQueued || pointer !== null || event.button !== 0) return;
+  pointer = event.pointerId;
+  lastPoint = null;
+  drawCanvas.setPointerCapture(pointer);
+  addInk(event);
+};
+drawCanvas.onpointermove = event => {
+  if (canDraw && !clearQueued && pointer === event.pointerId) addInk(event);
+};
+drawCanvas.onpointerup = drawCanvas.onpointercancel = drawCanvas.onlostpointercapture = event => {
+  if (pointer === event.pointerId) pointer = null;
+};
+$('drawClear').onclick = () => {
+  if (!canDraw || clearQueued) return;
+  inkQueue = [];
+  pointer = null;
+  clearQueued = true;
+  $('drawClear').disabled = true;
+};
+
+setInterval(async () => {
+  if (!canDraw || inkBusy || (!inkQueue.length && !clearQueued)) return;
+  const turnId = drawTurn;
+  const clear = clearQueued;
+  const payload = clear ? { turnId, clear } : { turnId, segments: inkQueue.splice(0, 96) };
+  inkBusy = true;
+  try {
+    await post('ink', payload, AbortSignal.timeout(4000));
+  } catch (error) {
+    if (drawTurn === turnId && canDraw) $('error').textContent = error.message;
+  } finally {
+    inkBusy = false;
+    if (drawTurn === turnId && clear) {
+      clearQueued = false;
+      $('drawClear').disabled = !canDraw;
+    }
+  }
+}, 50);
+
+$('guessForm').onsubmit = async event => {
+  event.preventDefault();
+  if (!connected || guessPending || $('guessForm').hidden) return;
+  const text = $('guessInput').value.trim();
+  if (!text) return;
+  const turnId = drawTurn;
+  guessPending = turnId;
+  $('guessButton').disabled = true;
+  try {
+    const result = await post('guess', { turnId, text }, AbortSignal.timeout(4000));
+    if (drawTurn !== turnId) return;
+    guessFeedback = result.correct ? 'Угадано!' : 'Мимо. Попробуй ещё';
+    if (!result.correct) $('guessInput').select();
+  } catch (error) {
+    if (drawTurn === turnId) guessFeedback = error.message;
+  } finally {
+    if (guessPending === turnId) {
+      guessPending = null;
+      render();
+    }
+  }
+};
+
+function render() {
+  const me = state?.players.find(player => player.id === state.selfId);
+  const nextScreen = !me ? 'join' : state.drawing ? 'sketch' : state.phase;
+  if (screen !== nextScreen) {
+    $('error').textContent = '';
+    screen = nextScreen;
+    for (const section of screens) section.hidden = section.id !== screen;
+  }
+  if (embeddedPlayer) {
+    document.documentElement.dataset.embed = screen === 'join' ? 'player' : 'active';
+    if (screen !== 'join' && !embeddedJoinNotified) {
+      embeddedJoinNotified = true;
+      window.parent.postMessage({ type:'shumy-player-joined' }, embedParentOrigin);
+    }
+  }
+  $('connection').textContent = connected ? t('connected') : state ? t('connectionLost') : t('connecting');
+  $('connection').classList.toggle('is-connected', connected);
+  $('joinButton').disabled = joining || !connected;
+  $('joinButton').querySelector('span').textContent = joining ? t('joining') : t('joinGame');
+  if (screen !== 'sketch') {
+    canDraw = false;
+    drawTurn = null;
+    drawBoard.select(null);
+  }
+
+  if (pendingVote && (screen !== 'question' || pendingVote.round !== state.round || me.voted)) pendingVote = null;
+  if (screen === 'lobby') {
+    $('lobbyMode').textContent = state.mode === 'draw'
+      ? (playerLocale === 'en' ? 'Draw and guess. Everyone gets a turn.' : playerLocale === 'kk' ? 'Сурет сал да тап. Әркім кезек алады.' : 'Рисуй и угадывай. У каждого будет один ход')
+      : t('waiting');
+    $('roster').replaceChildren(...state.players.map(makePill));
+  } else if (screen === 'sketch') {
+    renderDrawing(me);
+  } else if (screen === 'question') {
+    $('round').textContent = `Раунд ${state.round} / ${state.totalRounds}`;
+    $('prompt').textContent = state.question + '?';
+    const options = JSON.stringify(state.players.map(({ id, name, color }) => [id, name, color]));
+    if (options !== optionsKey) {
+      optionsKey = options;
+      $('choices').replaceChildren(...state.players.map(player => {
+        const button = document.createElement('button');
+        button.append(playerDot(player.color), player.name);
+        button.dataset.target = player.id;
+        button.style.setProperty('--player', player.color);
+        if (player.id === me.id) {
+          const tag = document.createElement('small');
+          tag.textContent = 'ты';
+          button.append(' ', tag);
+        }
+        return button;
+      }));
+    }
+    $('voted').hidden = !me.voted;
+    $('choices').hidden = me.voted;
+    for (const button of $('choices').children) button.disabled = !connected || !!pendingVote;
+  } else if (screen === 'reveal') {
+    $('resultRound').textContent = `Раунд ${state.round} / ${state.totalRounds}`;
+    const names = state.results.winners.map(id => state.players.find(player => player.id === id)?.name || 'Игрок вышел');
+    $('winners').textContent = names.length ? `Больше всего голосов: ${names.join(', ')}` : 'Никто не проголосовал';
+    $('gained').textContent = '+' + (state.results.gained[me.id] ?? 0);
+    $('roundTotal').textContent = `Всего очков: ${me.score}`;
+  } else if (screen === 'final') {
+    const ranked = state.players.filter(p => state.mode !== 'draw' || state.drawRoute.some(player => player.id === p.id))
+      .sort((a, b) => b.score - a.score);
+    const place = ranked.indexOf(me) + 1;
+    $('place').textContent = place ? `${place}-е место` : 'Ты в лобби';
+    $('finalScore').textContent = place ? `Всего очков: ${me.score}` : 'Сможешь сыграть в следующей партии';
+  }
+}
+
+function askForRoom(message = '') {
+  $('roomForm').hidden = false;
+  $('joinForm').hidden = true;
+  document.querySelector('#join h1').textContent = t('enterCode');
+  document.querySelector('#join .join-copy').textContent = t('codeVisible');
+  $('error').textContent = message;
+}
+if (!hasRoom) askForRoom();
+
+// the page reloads with the code so the game connects to that room
+$('roomForm').onsubmit = event => {
+  event.preventDefault();
+  const code = $('roomInput').value.trim().toUpperCase();
+  if (!/^[A-HJ-NP-Z2-9]{8}$/.test(code)) {
+    $('error').textContent = t('invalidCode');
+    $('roomInput').focus();
+    return;
+  }
+  const params = new URLSearchParams(location.search);
+  params.set('room', code);
+  location.search = params;
+};
+
+$('joinForm').onsubmit = async event => {
+  event.preventDefault();
+  if (joining || !connected) return;
+  const name = $('name').value.trim();
+  if (!name) {
+    $('error').textContent = t('enterNameError');
+    $('name').focus();
+    return;
+  }
+  joining = true;
+  $('error').textContent = '';
+  render();
+  try {
+    const result = await post('join', { name });
+    save('kto.name', result.name);
+    $('name').value = result.name;
+  } catch (error) {
+    $('error').textContent = error instanceof TypeError ? t('noConnection') : error.message;
+  } finally {
+    joining = false;
+    render();
+  }
+};
+
+$('choices').onclick = async event => {
+  const target = event.target.closest('button')?.dataset.target;
+  if (!target || !connected || pendingVote || screen !== 'question') return;
+  const vote = { target, round:state.round };
+  pendingVote = vote;
+  $('error').textContent = '';
+  render();
+  try {
+    await post('vote', vote);
+  } catch (error) {
+    if (pendingVote !== vote) return;
+    pendingVote = null;
+    $('error').textContent = error instanceof TypeError ? 'Нет связи с сервером. Попробуй ещё раз.' : error.message;
+    render();
+  }
+};
+</script>
+</body>
+</html>
