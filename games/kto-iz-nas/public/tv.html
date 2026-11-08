@@ -1,0 +1,850 @@
+<!doctype html>
+<html lang="ru" data-game-mode="vote">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f9f8f4">
+<title>Кто из нас? Экран ведущего</title>
+<link rel="icon" href="data:,">
+<script>if (new URLSearchParams(location.search).get('shumyEmbed') === 'host') document.documentElement.dataset.embed = 'host';</script>
+<script src="./theme.js?v=15"></script>
+<link rel="stylesheet" href="./theme.css?v=10">
+<link rel="stylesheet" href="./drawing.css">
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  [hidden] { display:none !important; }
+  html,body { height:100%; }
+  body { overflow:hidden; }
+  /* inside the shumy dialog the page sits on the dialog paper */
+  html[data-embed], html[data-embed] body { background:transparent; background-image:none; }
+  html[data-embed] .drifters { display:none; }
+  /* the dialog already sets the theme and offers its own close, so the tv chrome goes */
+  html[data-embed] .host-tools, html[data-embed] .hint { display:none; }
+  /* the selected tile already names the game, so the lobby title goes in the dialog */
+  html[data-embed] #s-lobby > .top { display:none; }
+  html[data-embed] .screen { padding:2vh 4vw 4vh; }
+  .screen { position:absolute; z-index:1; inset:0; padding:4vh 4vw; display:none; flex-direction:column; }
+  .screen.on { display:flex; animation:tv-screen-arrive .42s cubic-bezier(.2,.75,.25,1) both; }
+  #s-lobby.on { animation:none; }
+  @keyframes tv-screen-arrive { from { opacity:0; transform:translateY(1.2vh) scale(.992); } to { opacity:1; transform:none; } }
+  h1 { font-size:6vh; font-weight:750; letter-spacing:-0.025em; }
+  .muted { color:var(--muted); }
+  button { font:inherit; font-weight:700; border:0; border-radius:.8vh; cursor:pointer; }
+  .btn { display:inline-flex; align-items:center; gap:.7em; background:var(--accent); color:var(--action-ink); padding:1.6vh 2.8vh; font-size:3vh; transition:transform .18s ease,filter .18s ease,box-shadow .18s ease,background-color var(--theme-duration) var(--theme-ease),color var(--theme-duration) var(--theme-ease),border-color var(--theme-duration) var(--theme-ease); }
+  .btn:enabled:hover { transform:translateY(-.35vh); filter:brightness(1.05); box-shadow:0 .55vh 0 rgba(0,0,0,.24); }
+  .btn:enabled:active { transform:translateY(.15vh); box-shadow:none; }
+  .btn:disabled { opacity:.4; cursor:default; }
+  .pill { display:inline-flex; align-items:center; gap:.6em; padding:1.2vh 2vh; border-radius:.7vh; font-weight:650; font-size:3vh;
+    background:var(--surface); border:1px solid var(--edge); transition:background-color var(--theme-duration) var(--theme-ease),border-color var(--theme-duration) var(--theme-ease),color var(--theme-duration) var(--theme-ease); }
+  .pill.off { opacity:.35; }
+  .top { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:1vh 2vw; }
+
+  .lobby { flex:1; display:grid; grid-template-columns:minmax(10rem, 13.5rem) minmax(16rem, 23rem) minmax(22rem, 34rem); justify-content:center; align-content:center; align-items:center; gap:clamp(1rem, 2.5vw, 2.5rem); margin-top:2vh; min-height:0; }
+  .lobby-invite { display:grid; justify-items:stretch; align-content:center; align-self:stretch; gap:1rem; min-width:0; padding-top:4rem; }
+  .invite-panel { display:grid; justify-items:center; align-content:center; gap:1rem; min-width:0; padding:1.25rem .85rem; border:2px solid var(--text); border-radius:1.5rem; background:var(--surface); box-shadow:6px 6px 0 var(--text); text-align:center; transition:background-color var(--theme-duration) var(--theme-ease),border-color var(--theme-duration) var(--theme-ease),color var(--theme-duration) var(--theme-ease),box-shadow var(--theme-duration) var(--theme-ease); }
+  .qr-frame { position:relative; width:clamp(8rem, 12vw, 11rem); max-width:100%; aspect-ratio:1; padding:.3rem; border:2px solid #30342f; border-radius:.8rem; background:#fff; }
+  .qr-frame img { display:block; width:100%; height:100%; }
+  .qr-face { position:absolute; top:50%; left:50%; display:grid; place-items:center; width:22%; aspect-ratio:1; border-radius:50%; background:#fff; transform:translate(-50%, -50%); pointer-events:none; }
+  .qr-face svg { display:block; width:88%; height:88%; }
+  .room-code { display:grid; justify-items:center; gap:.3rem; min-width:0; line-height:1.1; }
+  .room-code span { color:var(--muted); font-size:.85rem; font-weight:700; transition:color var(--theme-duration) var(--theme-ease); }
+  .room-code strong { max-width:100%; overflow-wrap:anywhere; font-size:clamp(1.2rem, 1.6vw, 1.65rem); font-weight:900; letter-spacing:.12em; font-variant-numeric:tabular-nums; }
+  .invite-link { display:inline-flex; align-items:center; justify-content:center; gap:.55rem; width:100%; min-height:2.8rem; padding:.55rem .65rem; border:2px solid var(--text); border-radius:.8rem; background:#f3be63; color:#30342f; box-shadow:3px 3px 0 var(--text); font-size:.87rem; font-weight:800; transition:transform .2s ease,box-shadow var(--theme-duration) var(--theme-ease),background-color var(--theme-duration) var(--theme-ease),border-color var(--theme-duration) var(--theme-ease); }
+  .invite-link:hover { transform:translate(-2px,-2px); box-shadow:5px 5px 0 var(--text); }
+  .invite-link:active { transform:translate(2px,2px); box-shadow:1px 1px 0 var(--text); }
+  .invite-link.is-copied { background:#a8d3bd; }
+  .invite-link svg { flex:none; width:1.1rem; height:1.1rem; fill:none; stroke:currentColor; stroke-width:2.3; stroke-linecap:round; stroke-linejoin:round; }
+  .share-status { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+  .lobby-invite .btn { width:100%; min-height:3.25rem; margin-top:1.2rem; justify-content:center; font-size:1.15rem; }
+  .lobby-invite .btn:disabled { opacity:1; background:var(--edge); color:var(--text); }
+  .start-hint { margin-top:-.5rem; color:var(--muted); font-size:.82rem; font-weight:700; line-height:1.3; text-align:center; transition:color var(--theme-duration) var(--theme-ease); }
+  .lobby-room { position:relative; display:flex; flex-direction:column; align-items:stretch; justify-content:flex-start; gap:1rem; min-width:0; height:min(75vh, 35rem); overflow:auto; padding:1.35rem; border:2px dashed color-mix(in srgb, var(--text) 35%, transparent); border-radius:1.5rem; background:color-mix(in srgb, #7fb59f 24%, var(--surface)); text-align:left; transition:background-color var(--theme-duration) var(--theme-ease),border-color var(--theme-duration) var(--theme-ease),color var(--theme-duration) var(--theme-ease); }
+  .count { width:100%; padding:0 0 .75rem; border-bottom:1px solid color-mix(in srgb, var(--text) 18%, transparent); font-size:clamp(1.15rem, 1.6vw, 1.55rem); font-weight:850; line-height:1.15; letter-spacing:-.02em; }
+  .players { display:flex; flex-direction:column; justify-content:flex-start; gap:.55rem; align-content:stretch; width:100%; max-height:100%; overflow:auto; padding:0 .2rem .5rem 0; }
+  .player-row { display:flex; align-items:center; gap:.75rem; min-width:0; min-height:3.5rem; padding:.45rem .75rem; border:1px solid var(--edge); border-radius:1rem; background:var(--surface); box-shadow:2px 2px 0 color-mix(in srgb, var(--text) 75%, transparent); font-size:clamp(.9rem, 1.1vw, 1rem); font-weight:750; transition:background-color var(--theme-duration) var(--theme-ease),border-color var(--theme-duration) var(--theme-ease),color var(--theme-duration) var(--theme-ease),opacity .2s ease; }
+  .player-row.off { opacity:.55; box-shadow:none; }
+  .player-avatar { display:grid; place-items:center; flex:none; width:2.5rem; height:2.5rem; overflow:hidden; border:2px solid var(--text); border-radius:50%; background:color-mix(in srgb, var(--player) 45%, var(--surface)); }
+  .player-avatar svg { width:78%; height:78%; }
+  .player-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .player-status { margin-left:auto; flex:none; color:var(--muted); font-size:.75rem; font-weight:700; }
+  .waiting-art { position:absolute; z-index:0; bottom:.65rem; left:50%; width:min(10rem, 60%); height:auto; overflow:visible; transform:translateX(-50%); transition:opacity var(--theme-duration) var(--theme-ease); pointer-events:none; }
+  .lobby-room.is-waiting .count, .lobby-room.is-waiting .players { position:relative; z-index:1; }
+  .lobby-room:not(.is-waiting) .waiting-art { display:none; }
+  .seg { display:flex; flex-wrap:wrap; gap:.4rem; }
+  .seg button { min-height:2.6rem; padding:.5rem .7rem; border:2px solid var(--text); border-radius:.6rem; background:var(--surface); color:var(--text); font-size:.9rem; transition:background-color var(--theme-duration) var(--theme-ease),border-color var(--theme-duration) var(--theme-ease),color var(--theme-duration) var(--theme-ease); }
+  .seg button[aria-pressed="true"] { background:#3d6c5b; color:#fff; }
+  .toggle { display:flex; align-items:center; gap:.6rem; margin-top:1rem; font-size:1rem; font-weight:700; cursor:pointer; }
+  .toggle input { width:1.2rem; height:1.2rem; accent-color:#3d6c5b; }
+
+  /* question */
+  .qwrap { flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; gap:3vh; }
+  .lead { font-size:4.5vh; font-weight:800; color:var(--muted); }
+  .qtext { font-size:9vh; font-weight:750; line-height:1.05; max-width:85vw; letter-spacing:-0.025em; }
+  .timer { position:relative; width:16vh; height:16vh; }
+  .timer svg { width:100%; height:100%; transform:rotate(-90deg); }
+  .timer .num { position:absolute; inset:0; display:grid; place-items:center; font-size:6vh; font-weight:750; font-variant-numeric:tabular-nums; }
+  .voters { display:flex; flex-wrap:wrap; gap:1.2vh; justify-content:center; }
+  .voters .pill { font-size:2.4vh; padding:.9vh 1.8vh; }
+
+  /* reveal */
+  .rq { font-size:4.5vh; font-weight:900; margin:1vh 0 3vh; }
+  .rows { display:flex; flex-direction:column; gap:1.6vh; flex:1; overflow:hidden; }
+  .row { display:grid; grid-template-columns:22vw 1fr; align-items:center; gap:2vw; }
+  .row .nm { font-size:3.6vh; font-weight:900; text-align:right; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .row .track { position:relative; height:7vh; }
+  .row .fill { height:100%; border-radius:.7vh; width:0; transition:width .45s ease-out; display:flex; align-items:center;
+    justify-content:flex-end; padding-right:2vh; font-size:3.6vh; font-weight:750; min-width:7vh; color:var(--ink); }
+  .row .who { font-size:2.1vh; color:var(--muted); margin-top:.6vh; font-weight:600; }
+  .row.win .nm { color:var(--accent); }
+  .gains { display:flex; flex-wrap:wrap; gap:1.2vh; margin-top:2vh; align-items:center; }
+  .gains .pill { font-size:2.2vh; padding:.8vh 1.6vh; }
+
+  /* final */
+  .podium { display:flex; justify-content:center; align-items:flex-end; gap:2vw; margin-top:3vh; }
+  .step { width:20vw; text-align:center; }
+  .step .block { border-radius:.8vh .8vh 0 0; display:grid; place-items:center; font-size:8vh; font-weight:750;
+    background:var(--surface); border:1px solid var(--edge); border-top:4px solid var(--player); color:var(--player); }
+  .step .n { font-size:4vh; font-weight:900; margin-bottom:.5vh; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .step .s { font-size:2.8vh; color:var(--muted); font-weight:700; margin-bottom:1.2vh; }
+  .rest { display:flex; gap:1.5vh; flex-wrap:wrap; justify-content:center; margin-top:3vh; }
+  .title { text-align:center; font-size:3vh; font-weight:800; margin-top:2.5vh; }
+  .hint { font-size:2vh; color:var(--muted); }
+  .host-tools { display:flex; flex:1 1 24rem; min-width:0; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:1vh 2.5vh; }
+  .host-tools .shortcuts { flex:0 1 auto; }
+  .shortcuts { display:flex; flex:1 1 24rem; min-width:0; flex-wrap:wrap; justify-content:flex-end; gap:1vh 2.5vh; }
+  .hint kbd { font:inherit; color:var(--text); border:1px solid var(--edge); border-radius:.4vh; padding:.2em .45em; margin-right:.4em; }
+  #hostError { position:absolute; bottom:1vh; left:4vw; color:var(--danger); }
+
+  #lobbyTitle { display:inline; padding:0 .15em; background:linear-gradient(transparent 60%, rgba(243,190,99,.75) 60% 90%, transparent 90%); }
+  .game-panel { position:relative; display:flex; flex-direction:column; min-width:0; height:min(75vh, 35rem); padding:1.2rem; border:2px solid var(--text); border-radius:1.5rem; background:var(--surface); box-shadow:6px 6px 0 var(--text); transition:background-color var(--theme-duration) var(--theme-ease),border-color var(--theme-duration) var(--theme-ease),color var(--theme-duration) var(--theme-ease),box-shadow var(--theme-duration) var(--theme-ease); }
+  .game-panel-head { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:1rem; }
+  .game-panel-title { font-size:clamp(1.4rem, 2vw, 1.8rem); font-weight:850; letter-spacing:-.02em; }
+  .panel-action { display:grid; place-items:center; flex:none; width:2.8rem; height:2.8rem; padding:.55rem; border:0; border-radius:.8rem; background:transparent; color:var(--text); transition:color var(--theme-duration) var(--theme-ease); }
+  .panel-action:hover { color:var(--accent); }
+  .panel-action svg { width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; transition:transform .38s cubic-bezier(.2,.75,.25,1); }
+  #gameSettings:hover svg, #gameSettings:focus-visible svg { transform:rotate(55deg); }
+  .panel-back:hover svg { transform:translateX(-3px); }
+  .game-panel-views { position:relative; flex:1; min-height:0; }
+  .game-grid, .game-settings { position:absolute; inset:0; transition:opacity .2s ease,transform .36s cubic-bezier(.2,.75,.25,1),visibility .2s; }
+  .game-panel[data-view="choose"] .game-grid, .game-panel[data-view="settings"] .game-settings { transition-delay:.2s; }
+  .game-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); grid-template-rows:repeat(2, minmax(0, 1fr)); gap:.7rem; }
+  .game-tile { position:relative; display:grid; grid-template-rows:minmax(0, 1fr) auto; justify-items:center; align-items:center; gap:.5rem; min-width:0; min-height:0; padding:.75rem .55rem; border:2px solid var(--text); border-radius:1rem; background:color-mix(in srgb, #f3be63 10%, var(--surface)); color:var(--text); text-align:center; box-shadow:3px 3px 0 var(--text); transition:background-color var(--theme-duration) var(--theme-ease),border-color var(--theme-duration) var(--theme-ease),color var(--theme-duration) var(--theme-ease),box-shadow var(--theme-duration) var(--theme-ease); }
+  .game-tile-art, .game-tile-description { grid-area:1 / 1; }
+  .game-tile-art { width:auto; height:5.1rem; max-width:100%; transition:opacity .25s ease,transform .25s ease; }
+  .game-tile-description { max-width:12rem; opacity:0; transform:translateY(6px); font-size:.9rem; font-weight:650; line-height:1.3; transition:opacity .25s ease,transform .25s ease; }
+  .game-tile-name { grid-column:1; font-size:clamp(.9rem, 1.15vw, 1.05rem); font-weight:850; line-height:1.15; }
+  button.game-tile:not([aria-pressed="true"]):hover { border-color:var(--accent); }
+  button.game-tile:active { filter:brightness(.97); }
+  .game-tile[aria-pressed="true"] { border-color:#3d6c5b; background:color-mix(in srgb, #7fb59f 30%, var(--surface)); box-shadow:3px 3px 0 #3d6c5b; }
+  .game-tile[aria-pressed="true"] .game-tile-art, button.game-tile:is(:hover, :focus-visible) .game-tile-art { opacity:0; transform:scale(.85) translateY(-5px); }
+  .game-tile[aria-pressed="true"] .game-tile-description, button.game-tile:is(:hover, :focus-visible) .game-tile-description { opacity:1; transform:none; }
+  .game-tile.is-soon { border-style:dashed; box-shadow:none; background:transparent; }
+  .game-tile.is-soon .game-tile-art { opacity:.45; }
+  .game-tile.is-soon .game-tile-name { color:var(--muted); }
+  .game-tile-ribbon { position:absolute; top:.4rem; right:.4rem; padding:.1rem .4rem; border-radius:999px; background:var(--text); color:var(--surface); font-size:.65rem; font-weight:800; transition:background-color var(--theme-duration) var(--theme-ease),color var(--theme-duration) var(--theme-ease); }
+  .game-settings { display:grid; align-content:center; justify-items:start; padding:.4rem .15rem; overflow:auto; }
+  #voteSettings { width:100%; }
+  .settings-game-name { margin-bottom:1.15rem; font-size:1.2rem; font-weight:800; }
+  .settings-label { margin-bottom:.5rem; color:var(--muted); font-size:.9rem; font-weight:750; transition:color var(--theme-duration) var(--theme-ease); }
+  #drawSettings { max-width:25rem; line-height:1.45; }
+  .game-panel[data-view="choose"] .game-settings { opacity:0; transform:translateX(1.25rem) scale(.985); visibility:hidden; pointer-events:none; }
+  .game-panel[data-view="settings"] .game-grid { opacity:0; transform:translateX(-1.25rem) scale(.985); visibility:hidden; pointer-events:none; }
+  .wait-guy { transform-box:fill-box; transform-origin:50% 100%; animation:wait-bob 2.4s cubic-bezier(.33,0,.67,1) infinite; }
+  .wait-guy:nth-of-type(2) { animation-delay:.3s; }
+  .wait-guy:nth-of-type(3) { animation-delay:.6s; }
+  .wait-dots circle { animation:wait-dot 1.2s cubic-bezier(.33,0,.67,1) infinite; }
+  .wait-dots circle:nth-child(2) { animation-delay:.2s; }
+  .wait-dots circle:nth-child(3) { animation-delay:.4s; }
+  @keyframes wait-bob { 0%, 100% { transform:none; } 40%, 55% { transform:translateY(-6%) scale(.97, 1.03); } }
+  @keyframes wait-dot { 0%, 60%, 100% { opacity:.3; } 30% { opacity:1; } }
+  .mode-note { margin-top:1vh; font-size:2.4vh; }
+  .sketch-screen .top h1 { font-size:4.3vh; }
+  .sketch-screen .sketch-clock { font-size:5vh; }
+  .sketch-layout { display:grid; grid-template-columns:minmax(0, 1.7fr) minmax(0, 1fr); gap:2.6vw; flex:1; min-height:0; margin-top:2vh; }
+  .sketch-stage { display:grid; grid-template-rows:auto minmax(0,1fr); gap:1.6vh; min-width:0; }
+  .sketch-heading { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.6vh 1vw; }
+  .sketch-heading strong { font-size:3.6vh; overflow-wrap:anywhere; }
+  .sketch-heading span { font-size:2.4vh; }
+  .tv-paper { display:grid; place-items:center; min-height:0; min-width:0; container-type:size; }
+  .tv-paper .sketch-board { width:min(100%, 160cqh); }
+  .sketch-route { align-self:start; min-width:0; max-height:100%; overflow:auto; background:var(--surface); border:1px solid var(--edge); padding:1.7vh 1.3vw; border-radius:1vh; transition:background-color var(--theme-duration) var(--theme-ease),border-color var(--theme-duration) var(--theme-ease); }
+  .sketch-route h2 { font-size:2.8vh; }
+  .route-map { position:relative; margin:1.6vh 0; }
+  .route-line { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+  .route-line polyline { fill:none; stroke:var(--muted); stroke-width:2; stroke-dasharray:5 5; }
+  .route-stops { position:relative; display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:1vh .65vw; list-style:none; }
+  .station { background:var(--bg); border:1px solid var(--edge); border-radius:.7vh; color:var(--muted); text-align:center; padding:.65vh .2vw; min-width:0; transition:background-color var(--theme-duration) var(--theme-ease),border-color var(--theme-duration) var(--theme-ease),color var(--theme-duration) var(--theme-ease); }
+  .station b { display:block; color:var(--player); font-size:2.45vh; }
+  .station span { display:block; font-size:1.8vh; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; }
+  .station.done { background:var(--accent-soft); }
+  .station.skipped { opacity:.5; }
+  .station[aria-current="step"] { background:var(--sketch-accent); border-color:var(--sketch-accent); color:#30342f; }
+  .station[aria-current="step"] b { color:inherit; }
+  .sketch-route .pill { font-size:1.85vh; padding:.45vh .7vw; }
+  .sketch-solvers { display:flex; flex-wrap:wrap; gap:.6vh .45vw; margin-top:1vh; }
+  @media (max-aspect-ratio:4/3) {
+    .sketch-layout { grid-template-columns:1fr; grid-template-rows:minmax(0, 1fr) auto; gap:1.5vh; }
+    .sketch-route { max-height:34vh; }
+    .route-stops { grid-template-columns:repeat(4, minmax(0,1fr)); }
+  }
+  @media (max-width:44rem) {
+    html,body { height:auto; min-height:100%; }
+    body { overflow:auto; }
+    .screen { position:relative; inset:auto; width:100%; min-height:100vh; min-height:100dvh; height:auto; padding:1rem; gap:1rem; }
+    .screen.on { display:flex; }
+    h1 { font-size:clamp(1.9rem,8vw,2.7rem); }
+    .top { align-items:flex-start; gap:.75rem; }
+    .host-tools { flex-basis:100%; justify-content:space-between; gap:.5rem; }
+    .host-tools .shortcuts { flex:1 1 100%; justify-content:flex-start; gap:.5rem 1rem; }
+    .hint { font-size:.8rem; }
+    .lobby { grid-template-columns:minmax(0,1fr); align-content:start; gap:1rem; margin-top:0; }
+    .lobby-invite { align-self:auto; padding-top:0; }
+    .invite-panel { grid-template-columns:minmax(0,1fr); justify-items:center; gap:.65rem; padding:1rem; border-radius:1.1rem; box-shadow:4px 4px 0 var(--text); text-align:center; }
+    .qr-frame { width:9rem; }
+    .invite-panel .room-code { justify-items:center; }
+    .invite-panel .room-code strong { font-size:clamp(1.05rem, 5vw, 1.5rem); }
+    .invite-link { width:100%; min-width:0; min-height:2.6rem; padding:.4rem .6rem; font-size:.78rem; }
+    .lobby-room { height:auto; min-height:11rem; padding:1rem; border-radius:1.1rem; }
+    .waiting-art { position:static; width:min(8rem, 45%); transform:none; }
+    .players { max-height:none; overflow:visible; }
+    .game-panel { height:auto; padding:1rem; border-radius:1.1rem; box-shadow:4px 4px 0 var(--text); }
+    .game-panel-views { flex:none; height:18rem; }
+    .game-tile { padding:.6rem .4rem; }
+    .game-tile-art { height:3.5rem; }
+    .game-tile-description { font-size:.76rem; }
+    .game-tile-name { font-size:.85rem; }
+    .lobby-invite .btn { margin-top:0; padding:.8rem 1rem; font-size:1rem; }
+    .game-settings .seg { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); }
+    .seg button { font-size:.8rem; }
+    #hostError { position:fixed; z-index:5; right:1rem; bottom:.5rem; left:1rem; font-size:.9rem; }
+    .sketch-screen .top h1 { font-size:clamp(1.7rem,7vw,2.4rem); }
+    .sketch-screen .sketch-clock { font-size:1.3rem; }
+    .sketch-layout { grid-template-columns:minmax(0,1fr); grid-template-rows:auto auto; gap:1rem; margin-top:0; }
+    .sketch-stage { min-height:0; gap:.75rem; }
+    .sketch-heading { align-items:flex-start; }
+    .sketch-heading strong { font-size:1.2rem; }
+    .sketch-heading span { font-size:.9rem; }
+    .sketch-route { max-height:none; padding:1rem; border-radius:.8rem; }
+    .sketch-route h2 { font-size:1.1rem; }
+    .route-stops { grid-template-columns:repeat(4,minmax(0,1fr)); gap:.45rem; }
+    .station { padding:.4rem .15rem; border-radius:.5rem; }
+    .station b { font-size:1rem; }
+    .station span { font-size:.7rem; }
+    .sketch-route .pill { font-size:.75rem; }
+    .qwrap { gap:1rem; padding-block:2rem; }
+    .lead { font-size:1.1rem; }
+    .qtext { max-width:100%; font-size:clamp(2.3rem,10vw,4rem); overflow-wrap:anywhere; }
+    .timer { width:clamp(6rem,24vw,9rem); height:clamp(6rem,24vw,9rem); }
+    .timer .num { font-size:2.2rem; }
+    .voters .pill { font-size:.9rem; padding:.5rem .8rem; }
+    .rq { font-size:1.35rem; margin:.5rem 0 1rem; }
+    .rows { gap:.75rem; overflow:visible; }
+    .row { grid-template-columns:minmax(5.5rem,28vw) minmax(0,1fr); gap:.75rem; }
+    .row .nm { font-size:1rem; }
+    .row .track { height:2.5rem; }
+    .row .fill { min-width:2.5rem; padding-right:.5rem; font-size:1rem; }
+    .row .who { font-size:.75rem; }
+    .gains .pill { font-size:.8rem; }
+    .podium { gap:.65rem; margin-top:1rem; }
+    .step { width:30%; }
+    .step .block { font-size:2.6rem; }
+    .step .n { font-size:.9rem; }
+    .step .s { font-size:.8rem; }
+    .rest { gap:.5rem; margin-top:1rem; }
+    .title { margin-top:1rem; font-size:1rem; }
+  }
+  @media (min-width:44.01rem) and (max-width:62rem) {
+    .lobby { grid-template-columns:minmax(9rem, 13rem) minmax(15rem, 1fr); align-content:start; gap:1.25rem; overflow:auto; padding:.75rem .25rem; }
+    .lobby-invite { padding-top:0; }
+    .game-panel { grid-column:1 / -1; }
+    .lobby-room { height:auto; min-height:16rem; }
+    .waiting-art { position:static; transform:none; }
+    .game-panel { height:auto; }
+    .game-panel-views { flex:none; height:24rem; }
+  }
+  @media (max-height:36rem) and (min-width:44.01rem) {
+    .lobby { align-items:start; overflow:auto; padding:.75rem .25rem; }
+    .lobby-invite { align-self:auto; padding-top:0; }
+    .lobby-room { height:auto; min-height:15rem; }
+    .waiting-art { position:static; transform:none; }
+    .game-panel { height:auto; }
+    .game-panel-views { flex:none; height:24rem; }
+  }
+  @media (prefers-reduced-motion:reduce) { .row .fill,.btn,.pill,.invite-panel,.invite-link,.lobby-room,.game-panel,.game-tile,.game-tile-ribbon,.game-grid,.game-settings,.game-tile-art,.game-tile-description,.panel-action,.panel-action svg,.seg button,.room-code span,.settings-label,.start-hint,.waiting-art { transition:none; } .screen.on,.wait-guy,.wait-dots circle { animation:none; } }
+</style>
+</head>
+<body>
+<div class="drifters" aria-hidden="true">
+  <span style="--x:4%;--y:16%;--w:54px;--h:54px;--turn:-14deg;--color:#a9654b"><svg viewBox="0 0 80 80"><use href="./objects.svg#pencil"/></svg></span>
+  <span style="--x:93%;--y:12%;--w:44px;--h:44px;--turn:12deg;--color:#527b6a"><svg viewBox="0 0 80 80"><use href="./objects.svg#dice"/></svg></span>
+  <span style="--x:8%;--y:52%;--w:42px;--h:42px;--turn:-8deg;--color:#8e769d"><svg viewBox="0 0 80 80"><use href="./objects.svg#speech"/></svg></span>
+  <span style="--x:92%;--y:48%;--w:46px;--h:46px;--turn:10deg;--color:#a9654b"><svg viewBox="0 0 80 80"><use href="./objects.svg#cards"/></svg></span>
+  <span style="--x:4%;--y:88%;--w:48px;--h:48px;--turn:14deg;--color:#527b6a"><svg viewBox="0 0 80 80"><use href="./objects.svg#question"/></svg></span>
+  <span style="--x:94%;--y:88%;--w:42px;--h:42px;--turn:-12deg;--color:#8e769d"><svg viewBox="0 0 80 80"><use href="./objects.svg#star"/></svg></span>
+  <span style="--x:30%;--y:6%;--w:34px;--h:34px;--turn:8deg;--color:#3f7b7e"><svg viewBox="0 0 80 80"><use href="./objects.svg#note"/></svg></span>
+  <span style="--x:69%;--y:95%;--w:38px;--h:38px;--turn:-10deg;--color:#9c8245"><svg viewBox="0 0 80 80"><use href="./objects.svg#heart"/></svg></span>
+</div>
+
+<section class="screen" id="s-lobby">
+  <div class="top"><h1 id="lobbyTitle">Кто из нас?</h1><div class="host-tools">
+    <div class="theme-switcher theme-control" role="group" aria-label="Тема оформления" data-label="themeLabel">
+      <button type="button" data-theme-choice="light" aria-label="Светлая тема" title="Светлая тема" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg></button>
+      <button type="button" data-theme-choice="dark" aria-label="Тёмная тема" title="Тёмная тема" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 15.6A8.5 8.5 0 0 1 8.4 3.8 8.6 8.6 0 1 0 20.2 15.6Z"/></svg></button>
+    </div>
+    <div class="hint shortcuts"><span><kbd data-text="spaceKey">Пробел</kbd> <span data-text="start">Начать</span></span><span><kbd>F</kbd> <span data-text="fullscreen">Полный экран</span></span></div>
+  </div></div>
+  <div class="lobby">
+    <div class="lobby-invite">
+    <aside class="invite-panel" aria-label="Подключение к игре" data-label="joinGame">
+      <div class="qr-frame">
+        <img id="qr" alt="QR-код для входа в игру">
+        <span class="qr-face" aria-hidden="true">
+          <svg viewBox="0 0 64 64" focusable="false">
+            <g transform="translate(-1 2)">
+              <path d="M13 50C3 44 2 32 8 26 3 16 10 8 21 11 25 1 39 1 44 11 56 7 64 18 57 27c8 12 0 25-12 27-9 5-22 4-32-4Z" fill="#ee9878"/>
+              <ellipse cx="24" cy="29" rx="7" ry="10" fill="#fffaf1"/><ellipse cx="42" cy="27" rx="7" ry="10" fill="#fffaf1"/>
+              <ellipse cx="26" cy="30" rx="2.5" ry="4.5" fill="#30342f"/><ellipse cx="44" cy="28" rx="2.5" ry="4.5" fill="#30342f"/>
+              <path d="M18 53c10 5 22 5 32 1" fill="none" stroke="#3f7b7e" stroke-width="5" stroke-linecap="round"/>
+              <path d="M18 53c10 5 22 5 32 1" fill="none" stroke="#3f7b7e" stroke-width="5" stroke-linecap="round"/>
+            </g>
+          </svg>
+        </span>
+      </div>
+      <div class="room-code"><span data-text="roomCodeLabel">Код комнаты</span><strong id="roomCode"></strong></div>
+      <button class="invite-link" id="inviteLink" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.6 0l3-3a4 4 0 0 0-5.6-5.6l-1 1M14 10a4 4 0 0 0-5.6 0l-3 3a4 4 0 0 0 5.6 5.6l1-1"/></svg>
+        <span id="inviteLinkLabel" data-text="copyLink">Скопировать ссылку</span>
+      </button>
+      <span class="share-status" id="shareStatus" aria-live="polite"></span>
+    </aside>
+    <button class="btn" id="start" aria-describedby="startHint"><span id="startLabel" data-text="start">Начать</span><svg class="icon" aria-hidden="true"><use href="./icons.svg#arrow"/></svg></button>
+    <p class="start-hint" id="startHint" data-text="needPlayers" aria-live="polite">Нужно 2+ игрока</p>
+    </div>
+    <div class="lobby-room">
+      <div class="count" id="count" aria-live="polite"></div>
+      <div class="players" id="lobbyPlayers" role="list" aria-label="Игроки"></div>
+      <svg class="waiting-art" viewBox="0 0 300 150" aria-hidden="true">
+        <g stroke="#30342f" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
+          <g class="wait-guy">
+            <path d="M28 146c-4-42 8-72 32-72s36 30 32 72Z" fill="#ee9878"/>
+            <circle cx="51" cy="100" r="7" fill="#fffaf1"/><circle cx="70" cy="100" r="7" fill="#fffaf1"/>
+            <circle cx="53" cy="101" r="3" fill="#30342f" stroke="none"/><circle cx="72" cy="101" r="3" fill="#30342f" stroke="none"/>
+            <path d="M54 117c4 3 9 3 13 0" fill="none"/>
+          </g>
+          <g class="wait-guy">
+            <path d="M112 146c-3-56 14-92 38-92s41 36 38 92Z" fill="#7fb59f"/>
+            <circle cx="139" cy="88" r="8" fill="#fffaf1"/><circle cx="162" cy="88" r="8" fill="#fffaf1"/>
+            <circle cx="141" cy="86" r="3.4" fill="#30342f" stroke="none"/><circle cx="164" cy="86" r="3.4" fill="#30342f" stroke="none"/>
+            <ellipse cx="151" cy="108" rx="4" ry="5" fill="#30342f" stroke="none"/>
+          </g>
+          <g class="wait-guy">
+            <path d="M234 70c-2-8 2-14 8-16" fill="none"/>
+            <path d="M242 54c7-3 12 0 13 6-7 2-12 0-13-6Z" fill="#3f7b7e"/>
+            <path d="M210 146c-3-38 10-64 32-64s35 26 32 64Z" fill="#f3be63"/>
+            <circle cx="233" cy="108" r="6.5" fill="#fffaf1"/><circle cx="251" cy="108" r="6.5" fill="#fffaf1"/>
+            <circle cx="231" cy="109" r="2.8" fill="#30342f" stroke="none"/><circle cx="249" cy="109" r="2.8" fill="#30342f" stroke="none"/>
+            <path d="M235 123c4 3 9 3 13 0" fill="none"/>
+          </g>
+          <path d="M8 146h284" fill="none"/>
+          <g>
+            <path d="M176 14h44c7 0 10 4 10 10v12c0 6-3 10-10 10h-24l-12 10 2-10h-10c-7 0-10-4-10-10V24c0-6 3-10 10-10Z" fill="#fffaf1"/>
+            <g class="wait-dots" fill="#30342f" stroke="none"><circle cx="186" cy="30" r="3.5"/><circle cx="198" cy="30" r="3.5"/><circle cx="210" cy="30" r="3.5"/></g>
+          </g>
+        </g>
+      </svg>
+    </div>
+    <section class="game-panel" aria-labelledby="gamePanelTitle" data-view="choose">
+      <div class="game-panel-head">
+        <h2 class="game-panel-title" id="gamePanelTitle" data-text="chooseGame">Выбери игру</h2>
+        <button class="panel-action" id="gameSettings" type="button" aria-label="Настройки игры" title="Настройки игры" data-label="gameSettings" aria-controls="gameSettingsView">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 2h4l.6 2.3 1.7.7 2-.9 2.8 2.8-.9 2 .7 1.7L23 11v4l-2.3.6-.7 1.7.9 2-2.8 2.8-2-.9-1.7.7L14 24h-4l-.6-2.3-1.7-.7-2 .9-2.8-2.8.9-2-.7-1.7L1 15v-4l2.3-.6.7-1.7-.9-2 2.8-2.8 2 .9 1.7-.7Z" transform="translate(0 -1) scale(1 .92)"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+        <button class="panel-action panel-back" id="backToGames" type="button" aria-label="Назад к выбору игры" title="Назад к выбору игры" data-label="backToGames" aria-controls="gameModes" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5-7 7 7 7M7 12h13"/></svg>
+        </button>
+      </div>
+      <div class="game-panel-views">
+      <div class="game-grid" id="gameModes" role="group" aria-labelledby="gamePanelTitle">
+        <button class="game-tile" type="button" data-mode="vote" aria-pressed="true">
+          <svg class="game-tile-art" viewBox="0 0 120 90" aria-hidden="true">
+            <g stroke="#30342f" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+              <path d="M16 86c-2-26 6-42 22-42s24 16 22 42Z" fill="#ee9878"/>
+              <circle cx="31" cy="64" r="3" fill="#30342f" stroke="none"/><circle cx="44" cy="64" r="3" fill="#30342f" stroke="none"/>
+              <path d="M32 74c3 2 7 2 10 0" fill="none"/>
+              <path d="M24 38l3-14 8 7 4-11 4 11 8-7 3 14Z" fill="#f3be63"/>
+              <path d="M64 86c-2-30 7-48 24-48s26 18 24 48Z" fill="#7fb59f"/>
+              <circle cx="81" cy="60" r="3" fill="#30342f" stroke="none"/><circle cx="95" cy="60" r="3" fill="#30342f" stroke="none"/>
+              <ellipse cx="88" cy="72" rx="3" ry="4" fill="#30342f" stroke="none"/>
+              <path d="M84 4h24c5 0 8 3 8 8v8c0 5-3 8-8 8h-12l-8 7 1-7h-5c-5 0-8-3-8-8v-8c0-5 3-8 8-8Z" fill="#fffaf1"/>
+              <path d="M92 11c0-3 2-4 4-4s4 1 4 4c0 3-4 3-4 6" fill="none"/>
+            </g>
+          </svg>
+          <span class="game-tile-description" data-text="voteDescription">Выбери, кто из друзей лучше подходит к вопросу.</span>
+          <span class="game-tile-name" data-text="voteGame">Кто из нас?</span>
+        </button>
+        <button class="game-tile" type="button" data-mode="draw" aria-pressed="false">
+          <svg class="game-tile-art" viewBox="0 0 120 90" aria-hidden="true">
+            <g stroke="#30342f" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+              <rect x="14" y="10" width="70" height="66" rx="6" fill="#fffaf1" transform="rotate(-6 49 43)"/>
+              <circle cx="66" cy="26" r="7" fill="#f3be63"/>
+              <path d="M28 66V48l13-11 13 11v18Z" fill="#ee9878"/>
+              <path d="M37 66v-9h8v9" fill="none"/>
+              <path d="M20 70c14-3 40-5 58-4" fill="none" stroke="#3f7b7e"/>
+              <path d="M76 82l26-42 9 6-26 42-11 3Z" fill="#f3be63"/>
+              <path d="M76 82l-2 9 11-3" fill="#f2d6b0"/>
+              <path d="M102 40l3-5c2-3 6-2 8 0 2 2 2 5 1 6l-3 5Z" fill="#e78362"/>
+            </g>
+          </svg>
+          <span class="game-tile-description" data-text="drawDescription">Рисуй слово, пока остальные его угадывают.</span>
+          <span class="game-tile-name" data-text="drawGame">Рисуй и угадывай</span>
+        </button>
+        <div class="game-tile is-soon">
+          <span class="game-tile-ribbon" data-text="soon">Скоро</span>
+          <svg class="game-tile-art" viewBox="0 0 120 90" aria-hidden="true">
+            <g stroke="#30342f" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+              <path d="M14 84h92" fill="none"/>
+              <rect x="22" y="50" width="18" height="34" rx="3" fill="#ee9878"/>
+              <rect x="50" y="26" width="18" height="58" rx="3" fill="#7fb59f"/>
+              <rect x="78" y="60" width="18" height="24" rx="3" fill="#f3be63"/>
+              <path d="M54 12c0-4 3-6 6-6s6 2 6 6c0 4-6 4-6 8" fill="none"/>
+            </g>
+          </svg>
+          <span class="game-tile-name" data-text="crowdGame">Угадай зал</span>
+        </div>
+        <div class="game-tile is-soon">
+          <span class="game-tile-ribbon" data-text="soon">Скоро</span>
+          <svg class="game-tile-art" viewBox="0 0 120 90" aria-hidden="true">
+            <g stroke="#30342f" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+              <path d="M48 58c0-8-10-12-10-26a22 22 0 0 1 44 0c0 14-10 18-10 26Z" fill="#f3be63"/>
+              <path d="M50 66h20m-16 8h12" fill="none"/>
+              <path d="M30 16l6 5m54-5-6 5M24 34h8m56 0h8" fill="none"/>
+              <rect x="14" y="78" width="92" height="8" rx="4" fill="#fffaf1"/>
+              <rect x="14" y="78" width="62" height="8" rx="4" fill="#7fb59f"/>
+            </g>
+          </svg>
+          <span class="game-tile-name" data-text="quizGame">Квиз с уверенностью</span>
+        </div>
+      </div>
+      <div class="game-settings" id="gameSettingsView" aria-hidden="true" inert>
+        <p class="settings-game-name" id="settingsGameName"></p>
+        <div id="voteSettings">
+          <p class="settings-label" data-text="roundsLabel">Раундов</p>
+          <div class="seg" id="rounds" role="group" aria-label="Число раундов" data-label="roundsLabel"></div>
+          <label class="toggle" id="anonSetting"><input type="checkbox" id="anon"> <span data-text="anonymous">Анонимно</span></label>
+        </div>
+        <p id="drawSettings" data-text="drawSettings" hidden>Каждый игрок рисует по очереди. На ход даётся 65 секунд.</p>
+      </div>
+      </div>
+    </section>
+  </div>
+</section>
+
+<section class="screen sketch-screen" id="s-sketch">
+  <div class="top">
+    <div><span class="sketch-kicker" id="sketchRound"></span><h1 data-text="drawGame">Рисуй и угадывай</h1></div>
+    <span class="sketch-clock" id="sketchClock"></span>
+  </div>
+  <div class="sketch-layout">
+    <div class="sketch-stage">
+      <div class="sketch-heading">
+        <strong id="sketchTitle"></strong>
+        <span class="sketch-mask" id="sketchClue"></span>
+      </div>
+      <div class="tv-paper"><canvas class="sketch-board" id="sketchCanvas" width="960" height="600" aria-label="Рисунок раунда" data-label="roundDrawing"></canvas></div>
+    </div>
+    <aside class="sketch-route">
+      <h2 data-text="turnMap">Карта ходов</h2>
+      <div class="route-map">
+        <svg class="route-line" id="routeLine" preserveAspectRatio="none" aria-hidden="true"><polyline vector-effect="non-scaling-stroke"/></svg>
+        <ol class="route-stops" id="routeStops"></ol>
+      </div>
+      <p class="hint" id="sketchCount"></p>
+      <div class="sketch-solvers" id="sketchSolvers"></div>
+    </aside>
+  </div>
+  <div class="bar"><button class="btn" id="sketchAdvance"><span id="sketchAdvanceLabel"></span><svg class="icon" aria-hidden="true"><use href="./icons.svg#arrow"/></svg></button></div>
+</section>
+
+<section class="screen" id="s-question">
+  <div class="top"><span class="lead" id="qround"></span><span class="lead" id="qcount"></span></div>
+  <div class="qwrap">
+    <div class="lead" data-text="voteLead">Кто из нас скорее всего…</div>
+    <div class="qtext" id="qtext"></div>
+    <div class="timer">
+      <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="10"/>
+        <circle id="ring" cx="50" cy="50" r="44" fill="none" stroke="var(--accent)" stroke-width="10" stroke-linecap="round" stroke-dasharray="276.5"/></svg>
+      <div class="num" id="tnum"></div>
+    </div>
+    <div class="voters" id="voters"></div>
+  </div>
+  <div class="bar"><button class="btn" id="skip" data-text="showAnswers">Показать ответы</button></div>
+</section>
+
+<section class="screen" id="s-reveal">
+  <div class="top"><span class="lead" id="rround"></span><span class="hint"><kbd data-text="spaceKey">Пробел</kbd> <span data-text="next">Дальше</span></span></div>
+  <div class="rq" id="rq"></div>
+  <div class="rows" id="rows"></div>
+  <div class="gains" id="gains"></div>
+  <div class="bar"><button class="btn" id="next"><span id="nextLabel">Дальше</span><svg class="icon" aria-hidden="true"><use href="./icons.svg#arrow"/></svg></button></div>
+</section>
+
+<section class="screen" id="s-final">
+  <div class="top"><h1 data-text="results">Итоги</h1><span class="hint"><kbd data-text="spaceKey">Пробел</kbd> <span data-text="newGame">Новая игра</span></span></div>
+  <div class="podium" id="podium"></div>
+  <div class="rest" id="rest"></div>
+  <div class="title" id="titles"></div>
+  <div class="bar"><button class="btn" id="again"><svg class="icon" aria-hidden="true"><use href="./icons.svg#reset"/></svg><span data-text="newGame">Новая игра</span></button></div>
+</section>
+
+<p id="hostError" role="alert"></p>
+<script src="./drawing-client.js"></script>
+<script>
+document.querySelectorAll('.drifters span').forEach(element => {
+  element.style.setProperty('--x', `${3 + Math.random() * 92}%`);
+  element.style.setProperty('--y', `${3 + Math.random() * 92}%`);
+  element.style.setProperty('--turn', `${Math.round(Math.random() * 40 - 20)}deg`);
+});
+const $ = id => document.getElementById(id);
+const params = new URLSearchParams(location.search);
+const locale = ['ru', 'en', 'kk'].includes(params.get('shumyLang') || params.get('lang'))
+  ? params.get('shumyLang') || params.get('lang')
+  : 'ru';
+const text = {
+  ru: {
+    hostScreen:'Экран ведущего', voteGame:'Кто из нас?', drawGame:'Рисуй и угадывай', chooseGame:'Выбери игру',
+    soon:'Скоро', crowdGame:'Угадай зал', quizGame:'Квиз с уверенностью', roomCodeLabel:'Код комнаты', joinGame:'Подключение к игре',
+    voteDescription:'Выбери, кто из друзей лучше подходит к вопросу.', drawDescription:'Рисуй слово, пока остальные его угадывают.',
+    gameSettings:'Настройки игры', backToGames:'Назад к выбору игры', roundsLabel:'Раундов', drawSettings:'Каждый игрок рисует по очереди. На ход даётся 65 секунд.',
+    waiting:'Ждём игроков…', playerCount:'Игроков: {count}', anonymous:'Анонимно', rounds:'{count} раундов',
+    needPlayers:'Нужно 2+ игрока', start:'Начать', showQr:'QR-код для входа',
+    copyLink:'Скопировать ссылку', copied:'Ссылка скопирована', themeLabel:'Тема оформления',
+    lightTheme:'Светлая тема', darkTheme:'Тёмная тема', spaceKey:'Пробел', fullscreen:'Полный экран',
+    roundDrawing:'Рисунок раунда', turnMap:'Карта ходов', voteLead:'Кто из нас скорее всего…',
+    showAnswers:'Показать ответы', next:'Дальше', results:'Итоги', newGame:'Новая игра',
+    round:'Раунд {round} / {total}', turn:'Ход {round} из {total}', drawBy:'Рисует {name}',
+    solved:'Угадали: {count}', artistPoints:'Художнику +{points}', moreDrawing:'Ещё рисуем для {count}',
+    votes:'Голосов: {votes} / {players}', noVotes:'Никто не проголосовал', votedBy:'голосовали: {names}',
+    majority:'Угадали большинство:', noMajority:'Никто не угадал большинство',
+    score:'{score} очков', place:'{place}-е место, {name}, {score} очков',
+    mostPicked:'Чаще всех «тот самый из нас»: {name} ({count} раз)',
+    showWord:'Показать слово', nextTurn:'Следующий ход', nobody:'Игрок вышел', you:'ты'
+  },
+  en: {
+    hostScreen:'Host screen', voteGame:'Who’s most likely?', drawGame:'Draw and guess', chooseGame:'Choose a game',
+    soon:'Soon', crowdGame:'Guess the crowd', quizGame:'Confident quiz', roomCodeLabel:'Room code', joinGame:'Join the game',
+    voteDescription:'Pick the friend who best fits the prompt.', drawDescription:'Draw a word while everyone else guesses.',
+    gameSettings:'Game settings', backToGames:'Back to games', roundsLabel:'Rounds', drawSettings:'Players draw in turn. Each turn lasts 65 seconds.',
+    waiting:'Waiting for players…', playerCount:'Players: {count}', anonymous:'Anonymous voting', rounds:'{count} rounds',
+    needPlayers:'Need 2+ players', start:'Start', showQr:'QR code to join',
+    copyLink:'Copy link', copied:'Link copied', themeLabel:'Theme',
+    lightTheme:'Light theme', darkTheme:'Dark theme', spaceKey:'Space', fullscreen:'Full screen',
+    roundDrawing:'Round drawing', turnMap:'Turn map', voteLead:'Who’s most likely to…',
+    showAnswers:'Show answers', next:'Next', results:'Results', newGame:'New game',
+    round:'Round {round} / {total}', turn:'Turn {round} of {total}', drawBy:'{name} is drawing',
+    solved:'Guessed: {count}', artistPoints:'Artist +{points}', moreDrawing:'Still drawing for {count}',
+    votes:'Votes: {votes} / {players}', noVotes:'No one voted', votedBy:'voted for: {names}',
+    majority:'Guessed the majority:', noMajority:'No one guessed the majority',
+    score:'{score} points', place:'{place}: {name}, {score} points',
+    mostPicked:'Most often picked: {name} ({count} times)',
+    showWord:'Reveal the word', nextTurn:'Next turn', nobody:'Player left', you:'you'
+  },
+  kk: {
+    hostScreen:'Жүргізуші экраны', voteGame:'Кім көбірек?', drawGame:'Сурет сал да тап', chooseGame:'Ойынды таңда',
+    soon:'Жақында', crowdGame:'Көпшілікті тап', quizGame:'Сенімді викторина', roomCodeLabel:'Бөлме коды', joinGame:'Ойынға қосылу',
+    voteDescription:'Сұраққа көбірек сай келетін досты таңда.', drawDescription:'Сөзді сал, қалғандары оны табады.',
+    gameSettings:'Ойын баптаулары', backToGames:'Ойын таңдауға оралу', roundsLabel:'Раунд саны', drawSettings:'Ойыншылар кезекпен сурет салады. Әр кезекке 65 секунд беріледі.',
+    waiting:'Ойыншыларды күтіп отырмыз…', playerCount:'Ойыншылар: {count}', anonymous:'Жасырын дауыс беру', rounds:'{count} раунд',
+    needPlayers:'Кемінде 2 ойыншы керек', start:'Бастау', showQr:'Қосылуға арналған QR-код',
+    copyLink:'Сілтемені көшіру', copied:'Сілтеме көшірілді', themeLabel:'Тақырып',
+    lightTheme:'Ашық тақырып', darkTheme:'Қараңғы тақырып', spaceKey:'Бос орын', fullscreen:'Толық экран',
+    roundDrawing:'Раунд суреті', turnMap:'Кезек картасы', voteLead:'Кім көбірек…',
+    showAnswers:'Жауаптарды көрсету', next:'Әрі қарай', results:'Қорытынды', newGame:'Жаңа ойын',
+    round:'Раунд {round} / {total}', turn:'{total}-ден {round}-кезек', drawBy:'{name} сурет салып жатыр',
+    solved:'Тапты: {count}', artistPoints:'Суретшіге +{points}', moreDrawing:'Тағы {count} ойыншы сурет салып жатыр',
+    votes:'Дауыс: {votes} / {players}', noVotes:'Ешкім дауыс бермеді', votedBy:'дауыс берді: {names}',
+    majority:'Көпшілікті тапты:', noMajority:'Көпшілікті ешкім таппады',
+    score:'{score} ұпай', place:'{place}-орын, {name}, {score} ұпай',
+    mostPicked:'Ең жиі таңдалған: {name} ({count} рет)',
+    showWord:'Сөзді көрсету', nextTurn:'Келесі кезек', nobody:'Ойыншы шықты', you:'сен'
+  }
+}[locale];
+const t = (key, values = {}) => Object.entries(values).reduce((value, [name, replacement]) => value.replaceAll(`{${name}}`, () => String(replacement)), text[key] ?? text.ru[key] ?? key);
+document.documentElement.lang = locale;
+document.title = `${t('voteGame')} · ${t('hostScreen')}`;
+document.querySelectorAll('[data-text]').forEach(element => { element.textContent = t(element.dataset.text); });
+document.querySelectorAll('[data-label]').forEach(element => element.setAttribute('aria-label', t(element.dataset.label)));
+document.querySelectorAll('[data-theme-choice]').forEach(button => {
+  const label = t(button.dataset.themeChoice === 'light' ? 'lightTheme' : 'darkTheme');
+  button.setAttribute('aria-label', label);
+  button.title = label;
+});
+$('qr').alt = t('showQr');
+$('inviteLink').setAttribute('aria-label', t('copyLink'));
+$('inviteLink').title = t('copyLink');
+for (const id of ['gameSettings', 'backToGames']) {
+  $(id).title = t(id);
+}
+document.querySelector('.qtext')?.setAttribute('aria-label', t('voteLead'));
+document.getElementById('sketchCanvas').setAttribute('aria-label', t('roundDrawing'));
+const room = params.get('room') || '';
+let S = null, localEnd = 0, lastKey = '';
+let settingsSaved = Promise.resolve(true);
+let advancing = false;
+async function api(action, body = {}) {
+  $('hostError').textContent = '';
+  try {
+    const response = await fetch('./api/' + action, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ room, ...body }) });
+    if (!response.ok) throw new Error((await response.json()).error);
+    return true;
+  } catch (error) {
+    $('hostError').textContent = error instanceof TypeError ? (locale === 'ru' ? 'Нет связи с сервером' : locale === 'en' ? 'Connection lost' : 'Байланыс жоқ') : error.message;
+    return false;
+  }
+}
+function saveSettings(body) {
+  if (!advancing) settingsSaved = settingsSaved.then(() => api('settings', body));
+}
+async function advance() {
+  if (advancing || !S || (S.phase === 'lobby' && $('start').disabled)) return;
+  advancing = true;
+  const { phase, round } = S;
+  const ready = phase !== 'lobby' || await settingsSaved;
+  settingsSaved = Promise.resolve(true);
+  if (ready) await api('next', { phase, round });
+  advancing = false;
+}
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const byId = id => S.players.find(p => p.id === id);
+const pill = (p, text = p.name, extra = '') => `<span class="pill ${extra}"><span class="dot" style="--player:${p.color}"></span>${esc(text)}</span>`;
+const lobbyPlayer = player => `<div class="player-row ${player.online ? '' : 'off'}" role="listitem" style="--player:${player.color}">
+  <span class="player-avatar" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="11" r="6" fill="var(--text)"/><path d="M5 29c.5-7 4.5-11 11-11s10.5 4 11 11" fill="var(--text)"/></svg></span>
+  <span class="player-name">${esc(player.name)}</span>${player.online ? '' : `<span class="player-status">${locale === 'en' ? 'Away' : locale === 'kk' ? 'Желіде жоқ' : 'Не в сети'}</span>`}
+</div>`;
+
+const es = new EventSource('./events?' + new URLSearchParams({ room }));
+// an expired room sends the host back to /tv, which opens a fresh one
+es.addEventListener('missing', () => { es.close(); location.replace('./tv' + location.search.replace(/([?&])room=[^&]*&?/, '$1').replace(/[?&]$/, '')); });
+async function colorQrFinders() {
+  const qr = $('qr');
+  try {
+    const response = await fetch(qr.src, { cache: 'no-store' });
+    if (!response.ok) return;
+    const image = new DOMParser().parseFromString(await response.text(), 'image/svg+xml').documentElement;
+    const viewBox = image.getAttribute('viewBox').trim().split(/\s+/).map(Number);
+    const size = viewBox[2];
+    const moduleCount = size - 8;
+    if (viewBox[3] !== size || moduleCount < 21) return;
+    const palette = ['#355f50', '#a34d42', '#806018'];
+    const offset = [...room].reduce((sum, character) => (sum + character.charCodeAt(0)) % palette.length, 0);
+    const colors = palette.map((_, index) => palette[(index + offset) % palette.length]);
+    const namespace = 'http://www.w3.org/2000/svg';
+    const corners = [[4, 4], [moduleCount - 3, 4], [4, moduleCount - 3]];
+    corners.forEach(([x, y], corner) => {
+      [[0, 7, colors[corner]], [1, 5, '#fff'], [2, 3, colors[corner]]].forEach(([inset, side, fill]) => {
+        const rect = document.createElementNS(namespace, 'rect');
+        rect.setAttribute('x', String(x + inset));
+        rect.setAttribute('y', String(y + inset));
+        rect.setAttribute('width', String(side));
+        rect.setAttribute('height', String(side));
+        rect.setAttribute('fill', fill);
+        image.append(rect);
+      });
+    });
+    const source = new Blob([new XMLSerializer().serializeToString(image)], { type: 'image/svg+xml' });
+    const sourceUrl = URL.createObjectURL(source);
+    qr.addEventListener('load', () => URL.revokeObjectURL(sourceUrl), { once: true });
+    qr.src = sourceUrl;
+  } catch {}
+}
+$('qr').src = './qr.svg?' + new URLSearchParams({ room, lang: locale });
+$('qr').addEventListener('load', colorQrFinders, { once: true });
+$('roomCode').textContent = room;
+function setGamePanelView(view) {
+  const settings = view === 'settings';
+  document.querySelector('.game-panel').dataset.view = view;
+  $('gameModes').inert = settings;
+  $('gameModes').setAttribute('aria-hidden', String(settings));
+  $('gameSettingsView').inert = !settings;
+  $('gameSettingsView').setAttribute('aria-hidden', String(!settings));
+  $('gameSettings').hidden = settings;
+  $('backToGames').hidden = !settings;
+  $('gamePanelTitle').textContent = t(settings ? 'gameSettings' : 'chooseGame');
+}
+const joinUrl = () => {
+  const url = new URL(S?.joinUrl || location.href);
+  url.searchParams.set('lang', locale);
+  return url.href;
+};
+const roundCount = count => t('rounds', { count });
+const playerCount = count => {
+  if (locale === 'en') return `${count} ${count === 1 ? 'player' : 'players'}`;
+  if (locale === 'kk') return `${count} ойыншы`;
+  const lastTwo = count % 100;
+  const ending = lastTwo >= 11 && lastTwo <= 14 ? 'игроков' : count % 10 === 1 ? 'игрок' : count % 10 >= 2 && count % 10 <= 4 ? 'игрока' : 'игроков';
+  return `${count} ${ending}`;
+};
+const sketchBoard = Sketch.board($('sketchCanvas'), es);
+const sketchClock = Sketch.clock($('sketchClock'));
+es.onmessage = e => { S = JSON.parse(e.data); localEnd = Date.now() + S.remainingMs; render(); };
+
+function show(name) { document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === 's-' + name)); }
+
+function renderSketch() {
+  const turn = S.drawing;
+  const route = S.drawRoute;
+  const revealed = S.phase === 'draw-result';
+  const artist = route.find(player => player.id === turn.artist);
+  const guessers = route.filter(player => player.id !== artist.id && byId(player.id)?.online);
+  sketchClock(S.remainingMs);
+  $('sketchClock').hidden = revealed;
+  $('sketchRound').textContent = t('turn', { round: S.round, total: S.totalRounds });
+  $('sketchTitle').textContent = revealed ? turn.word : t('drawBy', { name: artist.name });
+  $('sketchClue').textContent = revealed ? '' : `${turn.category} / ${turn.mask}`;
+  $('sketchCount').textContent = revealed
+    ? `${t('solved', { count: turn.solved.length })}. ${t('artistPoints', { points: turn.gained[artist.id] ?? 0 })}`
+    : `${t('solved', { count: turn.solved.length })}. ${t('moreDrawing', { count: guessers.filter(player => !turn.solved.includes(player.id)).length })}`;
+  $('sketchSolvers').innerHTML = turn.solved.map(id => byId(id)).filter(Boolean)
+    .map(player => pill(player, revealed ? `${player.name} +${turn.gained[player.id]}` : player.name)).join('');
+
+  const points = [];
+  $('routeStops').innerHTML = route.map((player, index) => {
+    const row = Math.floor(index / 4);
+    const column = row % 2 === 0 ? index % 4 : 3 - index % 4;
+    points.push(`${column + .5},${row + .5}`);
+    const current = player.id === artist.id;
+    const skipped = turn.skipped.includes(player.id);
+    const done = index < S.round - 1 || (current && revealed);
+    return `<li class="station ${skipped ? 'skipped' : done ? 'done' : ''}" ${current ? 'aria-current="step"' : ''}
+      style="grid-column:${column + 1};grid-row:${row + 1};--player:${player.color}" title="${esc(player.name)}">
+      <b>${index + 1}</b><span>${esc(player.name)}</span></li>`;
+  }).join('');
+  $('routeLine').setAttribute('viewBox', `0 0 4 ${Math.ceil(route.length / 4)}`);
+  $('routeLine').firstElementChild.setAttribute('points', points.join(' '));
+  $('sketchAdvanceLabel').textContent = !revealed ? t('showWord')
+    : route.slice(S.round).some(player => byId(player.id)?.online) ? t('nextTurn') : t('results');
+}
+
+function render() {
+  document.documentElement.dataset.gameMode = S.mode === 'draw' ? 'draw' : 'vote';
+  show(S.drawing ? 'sketch' : S.phase);
+  sketchBoard.select(S.drawing?.id ?? null);
+  if (S.drawing) renderSketch();
+  if (S.phase === 'lobby') {
+    $('lobbyTitle').textContent = S.mode === 'draw' ? t('drawGame') : t('voteGame');
+    const drawing = S.mode === 'draw';
+    const n = drawing ? S.players.filter(p => p.online).length : S.players.length;
+    $('count').textContent = n ? playerCount(n) : t('waiting');
+    document.querySelector('.lobby-room').classList.toggle('is-waiting', n < 2);
+    $('lobbyPlayers').innerHTML = S.players.map(lobbyPlayer).join('');
+    $('rounds').innerHTML = [5, 10, 15, 20].map(r => `<button class="${r === S.totalRounds ? 'sel' : ''}" aria-pressed="${r === S.totalRounds}" data-r="${r}">${roundCount(r)}</button>`).join('');
+    $('anon').checked = S.anonymous;
+    $('anonSetting').hidden = drawing;
+    $('rounds').hidden = drawing;
+    $('voteSettings').hidden = drawing;
+    $('drawSettings').hidden = !drawing;
+    $('settingsGameName').textContent = t(drawing ? 'drawGame' : 'voteGame');
+    for (const button of $('gameModes').querySelectorAll('[data-mode]')) {
+      const selected = button.dataset.mode === S.mode;
+      button.classList.toggle('sel', selected);
+      button.setAttribute('aria-pressed', String(selected));
+    }
+    $('start').disabled = n < 2;
+    $('startLabel').textContent = t('start');
+    $('startHint').hidden = n >= 2;
+  }
+  if (S.phase === 'question') {
+    $('qround').textContent = t('round', { round: S.round, total: S.totalRounds });
+    $('qtext').textContent = S.question + '?';
+    const voted = S.players.filter(p => p.voted).length;
+    $('qcount').textContent = t('votes', { votes: voted, players: S.players.filter(p => p.online).length });
+    $('voters').innerHTML = S.players.map(p => pill(p, p.name, p.voted ? '' : 'off')).join('');
+  }
+  if (S.phase === 'reveal') {
+    const R = S.results;
+    $('rround').textContent = t('round', { round: S.round, total: S.totalRounds });
+    $('rq').textContent = `${t('voteLead').replace('…', '')} ${S.question}?`;
+    const key = S.round + ':' + R.totalVotes;
+    const max = Math.max(1, ...R.bars.map(b => b.count));
+    if (!R.bars.length) $('rows').innerHTML = `<div class="lead">${t('noVotes')}</div>`;
+    else $('rows').innerHTML = R.bars.slice(0, 6).map(b => {
+      const p = byId(b.id) || { name: '?', color: '#888' };
+      const who = b.voters.map(v => (byId(v) || { name: '?' }).name).join(', ');
+      return `<div class="row ${R.winners.includes(b.id) ? 'win' : ''}"><div class="nm">${esc(p.name)}</div>
+        <div><div class="track"><div class="fill" style="background:${p.color}" data-w="${(b.count / max) * 100}">${b.count}</div></div>
+        ${who ? `<div class="who">${t('votedBy', { names: esc(who) })}</div>` : ''}</div></div>`;
+    }).join('');
+    if (key !== lastKey) requestAnimationFrame(() => requestAnimationFrame(() =>
+      document.querySelectorAll('.fill').forEach(f => f.style.width = f.dataset.w + '%')));
+    else document.querySelectorAll('.fill').forEach(f => f.style.width = f.dataset.w + '%');
+    lastKey = key;
+    const g = Object.entries(R.gained).sort((a, b) => b[1] - a[1]);
+    $('gains').innerHTML = g.length ? `<span class="muted" style="font-weight:800;font-size:2.4vh">${t('majority')}</span>` +
+      g.map(([id, pts]) => { const p = byId(id); return p ? pill(p, `${p.name} +${pts}`) : ''; }).join('')
+      : `<span class="muted" style="font-size:2.4vh;font-weight:700">${t('noMajority')}</span>`;
+    $('nextLabel').textContent = S.round >= S.totalRounds ? t('results') : t('next');
+  }
+  if (S.phase === 'final') {
+    const ranked = S.players.filter(p => S.mode !== 'draw' || S.drawRoute.some(player => player.id === p.id))
+      .sort((a, b) => b.score - a.score);
+    const order = [1, 0, 2].filter(i => ranked[i]);
+    const h = [36, 26, 18];
+    $('podium').innerHTML = order.map(i => { const p = ranked[i];
+      return `<div class="step"><div class="n">${esc(p.name)}</div><div class="s">${t('score', { score: p.score })}</div>
+        <div class="block" style="height:${h[i]}vh;--player:${p.color}">${i + 1}</div></div>`; }).join('');
+    $('rest').innerHTML = ranked.slice(3).map((p, i) => pill(p, t('place', { place: i + 4, name: p.name, score: p.score }))).join('');
+    const top = [...S.players].sort((a, b) => b.timesPicked - a.timesPicked)[0];
+    $('titles').textContent = top && top.timesPicked ? t('mostPicked', { name: top.name, count: top.timesPicked }) : '';
+  }
+}
+
+// timer loop
+(function tick() {
+  if (S && S.phase === 'question') {
+    const left = Math.max(0, localEnd - Date.now());
+    $('tnum').textContent = Math.ceil(left / 1000);
+    $('ring').style.strokeDashoffset = 276.5 * (1 - left / S.durationMs);
+  }
+  requestAnimationFrame(tick);
+})();
+
+$('rounds').onclick = e => { const r = e.target.dataset.r; if (r) saveSettings({ totalRounds: +r }); };
+// copies the join address, with a textarea fallback where the clipboard api is blocked
+$('inviteLink').onclick = async () => {
+  const link = joinUrl();
+  try {
+    await navigator.clipboard.writeText(link);
+  } catch {
+    const field = Object.assign(document.createElement('textarea'), { value: link });
+    document.body.append(field);
+    field.select();
+    document.execCommand('copy');
+    field.remove();
+  }
+  const button = $('inviteLink');
+  button.classList.add('is-copied');
+  $('inviteLinkLabel').textContent = t('copied');
+  button.setAttribute('aria-label', t('copied'));
+  button.title = t('copied');
+  $('shareStatus').textContent = t('copied');
+  clearTimeout(button.resetTimer);
+  button.resetTimer = setTimeout(() => {
+    button.classList.remove('is-copied');
+    $('inviteLinkLabel').textContent = t('copyLink');
+    button.setAttribute('aria-label', t('copyLink'));
+    button.title = t('copyLink');
+    $('shareStatus').textContent = '';
+  }, 1600);
+};
+$('gameSettings').onclick = () => { setGamePanelView('settings'); $('backToGames').focus(); };
+$('backToGames').onclick = () => { setGamePanelView('choose'); $('gameSettings').focus(); };
+$('gameModes').onclick = e => { const mode = e.target.closest('[data-mode]')?.dataset.mode; if (mode) saveSettings({ mode }); };
+$('anon').onchange = e => saveSettings({ anonymous: e.target.checked });
+$('start').onclick = $('skip').onclick = $('next').onclick = $('again').onclick = $('sketchAdvance').onclick = advance;
+document.addEventListener('keydown', e => {
+  if (e.repeat) return;
+  if ((e.code === 'Space' || e.code === 'Enter') && !e.target.closest('button, input')) { e.preventDefault(); advance(); }
+  if (e.code === 'KeyF') document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+});
+</script>
+</body>
+</html>

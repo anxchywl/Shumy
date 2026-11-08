@@ -1,0 +1,9 @@
+*
+!Dockerfile
+!package.json
+!package-lock.json
+!server.js
+!questions.js
+!drawing.js
+!public/
+!public/**
