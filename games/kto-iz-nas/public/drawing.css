@@ -1,0 +1,10 @@
+:root { --sketch-paper:#fffdf4; --sketch-accent:#f2bc70; }
+[hidden] { display:none !important; }
+.sketch-board {
+  display:block; width:100%; aspect-ratio:8 / 5; background:var(--sketch-paper);
+  border-radius:.7rem; box-shadow:0 0 0 1px #766951;
+}
+.sketch-mask { font-weight:750; letter-spacing:.14em; white-space:pre-wrap; overflow-wrap:anywhere; }
+.sketch-clock { font-weight:750; font-variant-numeric:tabular-nums; color:var(--sketch-accent); }
+.sketch-clock.urgent { color:var(--danger); }
+.sketch-kicker { color:var(--sketch-accent); font-weight:700; }
