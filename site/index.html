@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Шуми. Присоединяйся с телефона или открой игру на общем экране как ведущий.">
+  <meta name="theme-color" content="#f9f8f4">
+  <title>Шуми. Игры для компании</title>
+  <link rel="icon" href="art/mark.svg?v=2" type="image/svg+xml">
+  <script src="theme.js?v=20"></script>
+  <style>
+    :root, .theme-wave-layer[data-preview-theme="light"] {
+      --paper: #f9f8f4; --ink: #30342f; --player-face: #3d6c5b;
+      --host-face: #f3ad8b; --host-text: #35231e;
+    }
+    :root[data-theme="dark"], .theme-wave-layer[data-preview-theme="dark"] {
+      --paper: #181a17; --ink: #f5f2e8; --player-face: #335b4d;
+      --host-face: #40302b; --host-text: #fff5eb;
+    }
+    body { background: var(--paper); color: var(--ink); }
+    .entry-card.player { background: var(--player-face); color: #fff; }
+    .entry-card.host { background: var(--host-face); color: var(--host-text); }
+  </style>
+  <link rel="stylesheet" href="styles.css?v=45">
+  <script src="motion.js?v=7" defer></script>
+  <script src="mascot.js?v=4" defer></script>
+</head>
+<body>
+  <div class="drifters" aria-hidden="true">
+    <span class="wobble" style="--x:3%;--y:22%;--w:62px;--h:62px;--turn:-22deg;--color:#a9654b;--delay:-0.0s"><svg viewBox="0 0 80 80"><use href="art/objects.svg?v=2#pencil"/></svg></span>
+    <span class="spin" style="--x:92%;--y:14%;--w:50px;--h:50px;--turn:18deg;--color:#527b6a;--delay:-1.3s"><svg viewBox="0 0 80 80"><use href="art/objects.svg?v=2#dice"/></svg></span>
+    <span class="bob filled" style="--x:94%;--y:50%;--w:52px;--h:52px;--turn:-12deg;--color:#8e769d;--delay:-2.6s"><svg viewBox="0 0 80 80"><use href="art/objects.svg?v=2#speech"/></svg></span>
+    <span class="wobble" style="--x:2%;--y:66%;--w:54px;--h:54px;--turn:-16deg;--color:#527b6a;--delay:-3.9s"><svg viewBox="0 0 80 80"><use href="art/objects.svg?v=2#cards"/></svg></span>
+    <span class="bob" style="--x:88%;--y:84%;--w:64px;--h:64px;--turn:16deg;--color:#a9654b;--delay:-5.2s"><svg viewBox="0 0 80 80"><use href="art/objects.svg?v=2#squiggle"/></svg></span>
+    <span class="wobble" style="--x:8%;--y:90%;--w:42px;--h:42px;--turn:-12deg;--color:#9c8245;--delay:-6.5s"><svg viewBox="0 0 80 80"><use href="art/objects.svg?v=2#question"/></svg></span>
+    <span class="spin filled" style="--x:27%;--y:8%;--w:40px;--h:40px;--turn:12deg;--color:#e78362;--delay:-0.8s"><svg viewBox="0 0 80 80"><use href="art/objects.svg?v=2#star"/></svg></span>
+    <span class="wobble" style="--x:74%;--y:24%;--w:44px;--h:44px;--turn:-14deg;--color:#a9654b;--delay:-2.1s"><svg viewBox="0 0 80 80"><use href="art/objects.svg?v=2#question"/></svg></span>
+    <span class="bob" style="--x:16%;--y:46%;--w:46px;--h:46px;--turn:8deg;--color:#3f7b7e;--delay:-3.4s"><svg viewBox="0 0 80 80"><use href="art/objects.svg?v=2#note"/></svg></span>
+    <span class="spin" style="--x:80%;--y:66%;--w:46px;--h:46px;--turn:-8deg;--color:#8e769d;--delay:-4.7s"><svg viewBox="0 0 80 80"><use href="art/objects.svg?v=2#dice"/></svg></span>
+    <span class="wobble filled" style="--x:58%;--y:6%;--w:38px;--h:38px;--turn:10deg;--color:#9c8245;--delay:-6.0s"><svg viewBox="0 0 80 80"><use href="art/objects.svg?v=2#crown"/></svg></span>
+    <span class="bob filled" style="--x:40%;--y:93%;--w:40px;--h:40px;--turn:-10deg;--color:#e78362;--delay:-0.3s"><svg viewBox="0 0 80 80"><use href="art/objects.svg?v=2#heart"/></svg></span>
+    <span class="wobble filled" style="--x:96%;--y:32%;--w:36px;--h:36px;--turn:14deg;--color:#9c8245;--delay:-1.6s"><svg viewBox="0 0 80 80"><use href="art/objects.svg?v=2#bolt"/></svg></span>
+    <span class="spin" style="--x:10%;--y:8%;--w:40px;--h:40px;--turn:-8deg;--color:#8e769d;--delay:-2.9s"><svg viewBox="0 0 80 80"><use href="art/objects.svg?v=2#spiral"/></svg></span>
+    <span class="wobble" style="--x:70%;--y:92%;--w:44px;--h:44px;--turn:8deg;--color:#3f7b7e;--delay:-4.2s"><svg viewBox="0 0 80 80"><use href="art/objects.svg?v=2#gamepad"/></svg></span>
+    <span class="bob" style="--x:22%;--y:72%;--w:40px;--h:40px;--turn:12deg;--color:#9c8245;--delay:-5.5s"><svg viewBox="0 0 80 80"><use href="art/objects.svg?v=2#bulb"/></svg></span>
+    <span class="wobble" style="--x:84%;--y:4%;--w:36px;--h:36px;--turn:-6deg;--color:#3f7b7e;--delay:-6.8s"><svg viewBox="0 0 80 80"><use href="art/objects.svg?v=2#timer"/></svg></span>
+    <span class="wobble" style="--x:5%;--y:40%;--w:40px;--h:40px;--turn:-10deg;--color:#e78362;--delay:-1.1s"><svg viewBox="0 0 80 80"><use href="art/objects.svg?v=2#brush"/></svg></span>
+    <span class="bob" style="--x:66%;--y:78%;--w:38px;--h:38px;--turn:10deg;--color:#9c8245;--delay:-2.4s"><svg viewBox="0 0 80 80"><use href="art/objects.svg?v=2#trophy"/></svg></span>
+    <span class="spin filled" style="--x:34%;--y:30%;--w:30px;--h:30px;--turn:0deg;--color:#8e769d;--delay:-3.7s"><svg viewBox="0 0 80 80"><use href="art/objects.svg?v=2#smile"/></svg></span>
+    <span class="spin" style="--x:90%;--y:96%;--w:32px;--h:32px;--turn:-14deg;--color:#527b6a;--delay:-5.0s"><svg viewBox="0 0 80 80"><use href="art/objects.svg?v=2#star"/></svg></span>
+    <span class="bob" style="--x:50%;--y:98%;--w:30px;--h:30px;--turn:6deg;--color:#a9654b;--delay:-6.3s"><svg viewBox="0 0 80 80"><use href="art/objects.svg?v=2#note"/></svg></span>
+  </div>
+
+  <header class="topbar">
+    <a class="source-link" href="https://github.com/anxchywl">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      <span data-i18n="source">Открытый код</span>
+    </a>
+    <div class="header-controls">
+      <div class="theme-switcher" role="group" aria-label="Тема оформления" data-i18n-label="theme">
+        <button type="button" data-theme-choice="light" aria-pressed="true" data-i18n-label="lightTheme">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>
+          <span data-i18n="lightMode">Светлая</span>
+        </button>
+        <button type="button" data-theme-choice="dark" aria-pressed="false" data-i18n-label="darkTheme">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 15.6A8.5 8.5 0 0 1 8.4 3.8 8.6 8.6 0 1 0 20.2 15.6Z"/></svg>
+          <span data-i18n="darkMode">Тёмная</span>
+        </button>
+      </div>
+      <div class="languages" role="group" aria-label="Язык" data-i18n-label="language" hidden>
+        <button type="button" data-language="ru" lang="ru">RU</button>
+        <button type="button" data-language="en" lang="en">EN</button>
+        <button type="button" data-language="kk" lang="kk">KZ</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="launcher">
+    <div class="brand">
+      <button class="mascot-badge" type="button" aria-label="Пощекотать Шуми" data-i18n-label="mascotButton">
+        <svg class="mascot" viewBox="-50 -60 320 270" aria-hidden="true">
+          <path class="prop prop-heart" d="M231 44c-14-9-22-17-22-26 0-6 5-10 10-10 5 0 9 3 12 8 3-5 7-8 12-8 5 0 10 4 10 10 0 9-8 17-22 26Z" pathLength="1" fill="none" stroke="#e78362" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          <g class="prop-zzz" fill="none" stroke="#8e769d" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+            <path class="prop" d="M150 40h11l-11 13h11"/>
+            <path class="prop" d="M168 14h14l-14 16h14"/>
+            <path class="prop" d="M190-16h18l-18 20h18"/>
+          </g>
+          <g class="prop prop-bubble">
+            <path d="M160-48h40a10 10 0 0 1 10 10v20a10 10 0 0 1-10 10h-26l-12 12 2-12h-4a10 10 0 0 1-10-10v-20a10 10 0 0 1 10-10Z" fill="white" stroke="#30342f" stroke-width="3.5" stroke-linejoin="round"/>
+            <path d="M171-35c0-5 3-8 8-8s8 3 8 7c0 5-8 6-8 11" fill="none" stroke="#30342f" stroke-width="3.5" stroke-linecap="round"/>
+            <path d="M197-42v13" stroke="#e78362" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="179" cy="-17" r="2.3" fill="#30342f"/><circle cx="197" cy="-17" r="2.3" fill="#e78362"/>
+          </g>
+          <g class="prop prop-banana" fill="#f3be63" stroke="#30342f" stroke-width="3" stroke-linejoin="round">
+            <path d="M150 189c-6-4-9-10-8-16 5 4 8 9 10 15Z"/>
+            <path d="M163 188c1-7 4-12 10-15 0 7-3 12-8 16Z"/>
+            <path d="M138 194c12-10 28-11 38-1-12-3-26-2-38 1Z"/>
+          </g>
+          <g class="prop prop-paper">
+            <g transform="rotate(6 224 35)">
+              <rect x="198" y="4" width="52" height="62" rx="3" fill="white" stroke="#30342f" stroke-width="3"/>
+              <g fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <path class="paint-line paint-ground" d="M203 57h42" pathLength="1" stroke="#3f7b7e"/>
+                <path class="paint-line paint-house" d="M207 56V41l11-9 11 9v15Zm8 0v-7h6v7" pathLength="1" stroke="#e78362"/>
+                <path class="paint-line paint-sun" d="M233 18a6 6 0 1 0 12 0a6 6 0 1 0-12 0m6-11v-2m9 13h2m-4-8 2-2" pathLength="1" stroke="#e6a93a"/>
+              </g>
+            </g>
+          </g>
+          <g class="prop prop-garden">
+            <path class="garden-stem" d="M250 176c0-12-4-22 1-38" pathLength="1" fill="none" stroke="#3f7b7e" stroke-width="3.5" stroke-linecap="round"/>
+            <path class="garden-leaf" d="M250 162c-9-1-13-6-13-11 7 0 12 4 13 11Zm1-8c7-3 12-1 14 4-6 2-11 1-14-4Z" fill="#7fb59f" stroke="#30342f" stroke-width="2.2" stroke-linejoin="round"/>
+            <g class="garden-bloom" fill="#f3be63" stroke="#30342f" stroke-width="2">
+              <circle cx="251" cy="128" r="5.5"/><circle cx="260" cy="135" r="5.5"/><circle cx="256" cy="145" r="5.5"/><circle cx="246" cy="145" r="5.5"/><circle cx="242" cy="135" r="5.5"/>
+              <circle cx="251" cy="138" r="5" fill="#e78362"/>
+            </g>
+            <path d="M236 176h29l-4 20h-21Z" fill="#e78362" stroke="#30342f" stroke-width="3" stroke-linejoin="round"/>
+            <path d="M234 176h33" stroke="#30342f" stroke-width="3" stroke-linecap="round"/>
+          </g>
+          <g class="prop-drops" fill="#6fb3d2">
+            <ellipse class="prop" cx="249" cy="96" rx="2.6" ry="3.8"/>
+            <ellipse class="prop" cx="252" cy="96" rx="2.6" ry="3.8"/>
+            <ellipse class="prop" cx="246" cy="96" rx="2.6" ry="3.8"/>
+          </g>
+          <g class="prop-hearts" fill="#e78362" stroke="#30342f" stroke-width="2" stroke-linejoin="round">
+            <path class="prop" d="M40 22c-7-5-11-9-11-13 0-3 2-5 5-5 2 0 4 1 6 4 2-3 4-4 6-4 3 0 5 2 5 5 0 4-4 8-11 13Z"/>
+            <path class="prop" d="M22 52c-5-4-8-7-8-10 0-2 2-4 4-4 2 0 3 1 4 3 1-2 2-3 4-3 2 0 4 2 4 4 0 3-3 6-8 10Z"/>
+          </g>
+          <g class="prop-notes" transform="translate(-40 -6)" fill="#8e769d" stroke="#8e769d" stroke-width="3" stroke-linecap="round">
+            <g class="prop"><path d="M58 92V76c5 1 9 4 9 9" fill="none"/><circle cx="54" cy="92" r="4.5" stroke="none"/></g>
+            <g class="prop"><path d="M36 66V50l12-3v16" fill="none"/><circle cx="32" cy="66" r="4.5" stroke="none"/><circle cx="44" cy="63" r="4.5" stroke="none"/></g>
+            <g class="prop"><path d="M60 40V24c5 1 9 4 9 9" fill="none"/><circle cx="56" cy="40" r="4.5" stroke="none"/></g>
+          </g>
+          <g class="mascot-body">
+            <g class="mascot-legs" fill="none" stroke="#30342f" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+              <path class="mascot-leg-left" d="M78 151 Q75 164 68 171 H59"/>
+              <path class="mascot-leg-right" d="M132 151 Q137 164 145 171 H154"/>
+            </g>
+            <g class="mascot-top">
+              <path class="mascot-arm-left" d="M54 112c-18 4-23 15-28 24" fill="none" stroke="#30342f" stroke-width="4.5" stroke-linecap="round"/>
+              <g class="mascot-arm-right">
+                <g class="prop prop-balloon" transform="translate(-12 0)">
+                  <path d="M193 66c10-18 4-34 40-62" fill="none" stroke="#30342f" stroke-width="2"/>
+                  <ellipse class="prop-balloon-skin" cx="238" cy="-16" rx="18" ry="22" fill="#e78362" stroke="#30342f" stroke-width="3"/>
+                  <path class="prop-balloon-skin" d="M232 5h12l-6 7Z" fill="#e78362" stroke="#30342f" stroke-width="2.5" stroke-linejoin="round"/>
+                  <path class="prop-balloon-skin" d="M229-25c2-5 5-8 9-9" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"/>
+                  <path class="prop prop-pop" d="M259-16h4m-50 0h-4m42-18 4-4m-38 4-4-4m38 32 4 4m-38-4-4 4" fill="none" stroke="#f3be63" stroke-width="4" stroke-linecap="round"/>
+                </g>
+                <path d="M161 108c15-4 24-16 27-33m-9 2 9-2 5-9" fill="none" stroke="#30342f" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <g class="prop prop-can">
+                  <path d="M187 58c-6-9 6-15 11-6" fill="none" stroke="#30342f" stroke-width="3" stroke-linecap="round"/>
+                  <path d="M219 64l13-7" stroke="#30342f" stroke-width="4" stroke-linecap="round"/>
+                  <rect x="193" y="56" width="27" height="20" rx="5" fill="#3f7b7e" stroke="#30342f" stroke-width="3"/>
+                </g>
+                <g class="prop prop-phone">
+                  <rect x="182" y="38" width="22" height="34" rx="5" fill="#30342f"/>
+                  <rect class="phone-screen" x="185" y="42" width="16" height="24" rx="2.5" fill="#9fc8b6"/>
+                </g>
+                <g class="prop prop-pencil">
+                  <path d="M184 77l2-3" stroke="#e78362" stroke-width="8"/>
+                  <path d="M186 74l17-25" stroke="#f3be63" stroke-width="8"/>
+                  <path d="M206.3 51.2 208 41.5l-8.3 5.3Z" fill="#f2d6b0" stroke="#30342f" stroke-width="2" stroke-linejoin="round"/>
+                </g>
+              </g>
+              <defs><clipPath id="shumi-body"><path d="M58 139c-20-10-27-29-22-47-7-19 2-34 19-39-2-24 14-38 33-30 9-21 33-21 42-1 23-5 40 11 35 31 21 7 28 24 18 42 8 22-5 42-25 47-20 18-77 18-100-3Z"/></clipPath></defs>
+              <path d="M58 139c-20-10-27-29-22-47-7-19 2-34 19-39-2-24 14-38 33-30 9-21 33-21 42-1 23-5 40 11 35 31 21 7 28 24 18 42 8 22-5 42-25 47-20 18-77 18-100-3Z" fill="#ee9878"/>
+              <g clip-path="url(#shumi-body)">
+                <path d="M196 60c-6 50-40 92-110 100 30 14 80 12 120-20Z" fill="#d9775b"/>
+                <path d="M54 66c4-14 14-22 26-24m28-16c8-6 18-7 26-2" fill="none" stroke="#fbc3ab" stroke-width="5" stroke-linecap="round"/>
+              </g>
+              <g clip-path="url(#shumi-body)">
+                <path d="M10 94c50 40 150 40 210-6v11c-60 46-160 46-210 6Z" fill="#3f7b7e"/>
+                <path d="M10 100c50 40 150 40 210-6v5c-60 46-160 46-210 6Z" fill="#2f6466"/>
+                <path d="M10 94c50 40 150 40 210-6M10 105c50 40 150 40 210-6" fill="none" stroke="#30342f" stroke-width="3"/>
+              </g>
+              <path d="M58 139c-20-10-27-29-22-47-7-19 2-34 19-39-2-24 14-38 33-30 9-21 33-21 42-1 23-5 40 11 35 31 21 7 28 24 18 42 8 22-5 42-25 47-20 18-77 18-100-3Z" fill="none" stroke="#30342f" stroke-width="4.5" stroke-linejoin="round"/>
+              <g class="mascot-scarf" transform="translate(6 -22)" fill="#3f7b7e" stroke="#30342f" stroke-width="3" stroke-linejoin="round">
+                <path class="scarf-tail scarf-tail-back" d="M84 151c4 8 8 15 14 21l7-6c-5-5-9-11-12-18Z"/>
+                <path class="scarf-tail scarf-tail-front" d="M75 151c-3 9-4 18-3 27l9 1c0-9 1-17 3-26Z"/>
+                <path d="M80 179h-9" fill="none" stroke-width="2"/>
+                <ellipse cx="80" cy="148" rx="8.5" ry="7"/>
+              </g>
+              <g class="mascot-eyes">
+                <ellipse cx="85" cy="81" rx="18" ry="24" fill="#fffaf1" stroke="#30342f" stroke-width="3.5"/>
+                <ellipse cx="129" cy="78" rx="18" ry="24" fill="#fffaf1" stroke="#30342f" stroke-width="3.5"/>
+                <g class="mascot-gaze">
+                  <g class="mascot-pupils" fill="#30342f">
+                    <ellipse cx="90" cy="84" rx="6" ry="10"/>
+                    <ellipse cx="134" cy="81" rx="6" ry="10"/>
+                    <circle cx="92.5" cy="79" r="2.4" fill="white"/><circle cx="136.5" cy="76" r="2.4" fill="white"/>
+                  </g>
+                </g>
+              </g>
+              <path class="prop mascot-closed" d="M70 84c10 7 20 7 30 0m14-3c10 7 20 7 30 0" fill="none" stroke="#30342f" stroke-width="4" stroke-linecap="round"/>
+              <path class="prop mascot-happy" d="M72 87c6-9 20-9 26 0m16-3c6-9 20-9 26 0" fill="none" stroke="#30342f" stroke-width="4.5" stroke-linecap="round"/>
+              <path class="prop mascot-dizzy" d="M78 74l14 14m0-14-14 14m44-17 14 14m0-14-14 14" fill="none" stroke="#30342f" stroke-width="4.5" stroke-linecap="round"/>
+              <path class="mascot-smile" d="M99 113c7 5 15 4 20-2" fill="none" stroke="#30342f" stroke-width="4" stroke-linecap="round"/>
+              <ellipse class="prop mascot-wow" cx="109" cy="114" rx="5" ry="6.5" fill="#30342f"/>
+              <g class="prop mascot-blush-big" fill="#e0705a" fill-opacity=".55"><ellipse cx="68" cy="106" rx="11" ry="6"/><ellipse cx="151" cy="102" rx="11" ry="6"/></g>
+              <path class="prop mascot-blush" d="M64 104h10m70-4h10" stroke="#e0705a" stroke-width="4" stroke-linecap="round"/>
+              <g class="prop-confetti">
+                <rect class="prop" x="104" y="109" width="10" height="10" rx="2" fill="#f3be63" style="--dx:-119px;--dy:-48px;--r:240deg"/>
+                <rect class="prop" x="104" y="109" width="10" height="10" rx="2" fill="#3f7b7e" style="--dx:-68px;--dy:-96px;--r:-200deg"/>
+                <circle class="prop" cx="109" cy="114" r="5.5" fill="#e78362" style="--dx:-17px;--dy:-112px;--r:0deg"/>
+                <rect class="prop" x="104" y="109" width="10" height="10" rx="2" fill="#8e769d" style="--dx:42px;--dy:-104px;--r:180deg"/>
+                <circle class="prop" cx="109" cy="114" r="5.5" fill="#f3be63" style="--dx:93px;--dy:-72px;--r:0deg"/>
+                <rect class="prop" x="104" y="109" width="10" height="10" rx="2" fill="#e78362" style="--dx:136px;--dy:-24px;--r:-260deg"/>
+                <circle class="prop" cx="109" cy="114" r="5.5" fill="#3f7b7e" style="--dx:-144px;--dy:8px;--r:0deg"/>
+                <rect class="prop" x="104" y="109" width="10" height="10" rx="2" fill="#8e769d" style="--dx:119px;--dy:24px;--r:300deg"/>
+              </g>
+              <g class="prop prop-stars" transform="translate(110 2) scale(1 .4)">
+                <g class="prop-stars-ring" fill="#f3be63" stroke="#30342f" stroke-width="2.5" stroke-linejoin="round">
+                  <path d="M0-10 3-3l7 3-7 3-3 7-3-7-7-3 7-3Z" transform="translate(52 0) scale(1.2 2.6)"/>
+                  <path d="M0-10 3-3l7 3-7 3-3 7-3-7-7-3 7-3Z" transform="translate(-26 45) scale(1.2 2.6)"/>
+                  <path d="M0-10 3-3l7 3-7 3-3 7-3-7-7-3 7-3Z" transform="translate(-26 -45) scale(1.2 2.6)"/>
+                </g>
+              </g>
+            </g>
+          </g>
+          <g class="prop prop-die">
+            <rect x="100" y="-18" width="26" height="26" rx="6" fill="white" stroke="#30342f" stroke-width="3.5"/>
+            <g fill="#e78362"><circle cx="107" cy="-11" r="2.4"/><circle cx="113" cy="-5" r="2.4"/><circle cx="119" cy="1" r="2.4"/></g>
+          </g>
+          <g class="prop prop-friend">
+            <path class="prop-friend-arm" d="M-10 170c-8-3-11-9-12-16" fill="none" stroke="#30342f" stroke-width="3.5" stroke-linecap="round"/>
+            <path d="M8 150c-2-7 0-12 4-14" fill="none" stroke="#30342f" stroke-width="3" stroke-linecap="round"/>
+            <path d="M12 136c7-3 11 0 12 6-7 2-11 0-12-6Z" fill="#3f7b7e" stroke="#30342f" stroke-width="2.5" stroke-linejoin="round"/>
+            <circle cx="8" cy="169" r="19" fill="#f3be63" stroke="#30342f" stroke-width="3.5"/>
+            <circle cx="3" cy="165" r="2.8" fill="#30342f"/><circle cx="15" cy="165" r="2.8" fill="#30342f"/>
+            <path d="M4 173c3 3 6 3 9 0" fill="none" stroke="#30342f" stroke-width="2.5" stroke-linecap="round"/>
+          </g>
+        </svg>
+      </button>
+      <h1 class="brand-name" aria-label="Шуми"><span class="brand-syllable">Шу<span class="brand-stress" aria-hidden="true">´</span></span><span>ми</span></h1>
+    </div>
+
+    <section class="entry" aria-label="Начать игру" data-i18n-label="start">
+      <a class="entry-card player" href="https://anxchywl.dev/igra/">
+        <span class="entry-copy">
+          <strong data-i18n="playerTitle">Я игрок</strong>
+          <span data-i18n="playerText">Введи код с экрана<br>ведущего и своё имя.</span>
+        </span>
+        <span class="entry-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></span>
+        <svg class="entry-art" viewBox="0 0 130 150" aria-hidden="true">
+          <g class="art-phone">
+            <rect x="28" y="14" width="66" height="128" rx="15" fill="#fffaf2" stroke="#1f3a30" stroke-width="3.5"/>
+            <path d="M52 23h18" stroke="#1f3a30" stroke-width="3" stroke-linecap="round"/>
+            <rect x="36" y="31" width="50" height="88" rx="7" fill="#dcebe3"/>
+            <circle cx="61" cy="52" r="11" fill="#ee9878" stroke="#1f3a30" stroke-width="2.5"/>
+            <circle cx="57" cy="50" r="1.8" fill="#1f3a30"/><circle cx="65" cy="50" r="1.8" fill="#1f3a30"/>
+            <path d="M58 56c2 1.5 4 1.5 6 0" fill="none" stroke="#1f3a30" stroke-width="1.8" stroke-linecap="round"/>
+            <rect x="42" y="70" width="38" height="12" rx="6" fill="white" stroke="#1f3a30" stroke-width="2"/>
+            <path class="art-caret" d="M49 73v6" stroke="#e78362" stroke-width="2" stroke-linecap="round"/>
+            <circle class="art-ripple" cx="61" cy="99" r="17" fill="none" stroke="#f3be63" stroke-width="2.5"/>
+            <rect x="42" y="91" width="38" height="16" rx="8" fill="#f3be63" stroke="#1f3a30" stroke-width="2.5"/>
+            <path d="M56 99h10m-4-4 4 4-4 4" fill="none" stroke="#1f3a30" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </g>
+        </svg>
+      </a>
+      <a class="entry-card host" href="https://anxchywl.dev/igra/tv">
+        <span class="entry-copy">
+          <strong data-i18n="hostTitle">Я ведущий</strong>
+          <span data-i18n="hostText">Открой на общем экране.<br>Получишь код комнаты.</span>
+        </span>
+        <span class="entry-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></span>
+        <svg class="entry-art" viewBox="0 0 150 130" aria-hidden="true">
+          <g class="art-antenna" fill="#f3be63" stroke="#5b3a2b" stroke-width="3" stroke-linecap="round">
+            <path d="M62 24 46 8m42 16 16-16" fill="none"/>
+            <circle cx="46" cy="8" r="4.5"/><circle cx="104" cy="8" r="4.5"/>
+          </g>
+          <path d="M40 112l-7 14m84-14 7 14" stroke="#5b3a2b" stroke-width="3.5" stroke-linecap="round"/>
+          <rect x="8" y="23" width="134" height="91" rx="17" fill="#e78362" stroke="#5b3a2b" stroke-width="3.5"/>
+          <rect x="20" y="34" width="92" height="69" rx="10" fill="#fff7ed" stroke="#5b3a2b" stroke-width="3"/>
+          <circle cx="127" cy="50" r="6.5" fill="#f3be63" stroke="#5b3a2b" stroke-width="2.5"/>
+          <circle cx="127" cy="70" r="4" fill="#fff7ed" stroke="#5b3a2b" stroke-width="2.5"/>
+          <path d="M121 86h12m-12 7h12" stroke="#5b3a2b" stroke-width="2.5" stroke-linecap="round"/>
+          <g class="art-crowd" stroke="#5b3a2b" stroke-width="2.5">
+            <g class="art-head"><path d="M30 103c0-9 4-14 10-14s10 5 10 14" fill="#f3be63"/><circle cx="40" cy="78" r="9" fill="#f3be63"/></g>
+            <g class="art-head"><path d="M53 103c0-11 5-16 13-16s13 5 13 16" fill="#3f7b7e"/><circle cx="66" cy="71" r="11.5" fill="#ee9878"/></g>
+            <g class="art-head"><path d="M82 103c0-9 4-14 10-14s10 5 10 14" fill="#8e769d"/><circle cx="92" cy="78" r="9" fill="#c9b8d6"/></g>
+          </g>
+          <g fill="#5b3a2b"><circle cx="37" cy="77" r="1.5"/><circle cx="43" cy="77" r="1.5"/><circle cx="62" cy="70" r="1.8"/><circle cx="70" cy="70" r="1.8"/><circle cx="89" cy="77" r="1.5"/><circle cx="95" cy="77" r="1.5"/></g>
+          <path d="M62 76c2.5 2 5.5 2 8 0" fill="none" stroke="#5b3a2b" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </a>
+    </section>
+  </main>
+
+  <dialog class="game-dialog" id="gameDialog" aria-label="Игровое окно">
+    <iframe class="game-dialog-frame" src="about:blank" title="Игровое окно" allow="fullscreen; clipboard-write"></iframe>
+  </dialog>
+
+  <script src="language.js?v=6"></script>
+  <script src="local-preview.js?v=2"></script>
+  <script src="game-dialog.js?v=8"></script>
+</body>
+</html>

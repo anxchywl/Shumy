@@ -1,0 +1,201 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 350" width="1180" height="350"><rect width="1180" height="350" fill="#f9f8f4"/><text x="30" y="42" font-family="Arial,sans-serif" font-size="25" font-weight="700" fill="#30342f">Five leg options for Shumy</text><rect x="20" y="65" width="216" height="265" rx="20" fill="#fffdf8" stroke="#d8d7cf" stroke-width="2"/><ns0:svg xmlns:ns0="http://www.w3.org/2000/svg" viewBox="20 10 176 194" aria-hidden="true" x="36" y="74" width="186" height="218">
+          <ns0:g class="mascot-body">
+            <ns0:g class="mascot-legs" fill="none" stroke="#30342f" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+              <ns0:path class="mascot-leg-left" d="M78 151 Q75 173 62 182 H51" />
+              <ns0:path class="mascot-leg-right" d="M132 151 Q138 173 152 182 H163" />
+            </ns0:g>
+            <ns0:g class="mascot-top">
+              <ns0:path class="mascot-arm-left" d="M54 112c-18 4-23 15-28 24" fill="none" stroke="#30342f" stroke-width="4.5" stroke-linecap="round" />
+              <ns0:path d="M161 108c13-2 20 4 24 15" fill="none" stroke="#30342f" stroke-width="4.5" stroke-linecap="round" /><ns0:defs><ns0:clipPath id="shumi-body"><ns0:path d="M58 139c-20-10-27-29-22-47-7-19 2-34 19-39-2-24 14-38 33-30 9-21 33-21 42-1 23-5 40 11 35 31 21 7 28 24 18 42 8 22-5 42-25 47-20 18-77 18-100-3Z" /></ns0:clipPath></ns0:defs>
+              <ns0:path d="M58 139c-20-10-27-29-22-47-7-19 2-34 19-39-2-24 14-38 33-30 9-21 33-21 42-1 23-5 40 11 35 31 21 7 28 24 18 42 8 22-5 42-25 47-20 18-77 18-100-3Z" fill="#ee9878" />
+              <ns0:g clip-path="url(#shumi-body)">
+                <ns0:path d="M196 60c-6 50-40 92-110 100 30 14 80 12 120-20Z" fill="#d9775b" />
+                <ns0:path d="M54 66c4-14 14-22 26-24m28-16c8-6 18-7 26-2" fill="none" stroke="#fbc3ab" stroke-width="5" stroke-linecap="round" />
+              </ns0:g>
+              <ns0:g clip-path="url(#shumi-body)">
+                <ns0:path d="M10 94c50 40 150 40 210-6v11c-60 46-160 46-210 6Z" fill="#3f7b7e" />
+                <ns0:path d="M10 100c50 40 150 40 210-6v5c-60 46-160 46-210 6Z" fill="#2f6466" />
+                <ns0:path d="M10 94c50 40 150 40 210-6M10 105c50 40 150 40 210-6" fill="none" stroke="#30342f" stroke-width="3" />
+              </ns0:g>
+              <ns0:path d="M58 139c-20-10-27-29-22-47-7-19 2-34 19-39-2-24 14-38 33-30 9-21 33-21 42-1 23-5 40 11 35 31 21 7 28 24 18 42 8 22-5 42-25 47-20 18-77 18-100-3Z" fill="none" stroke="#30342f" stroke-width="4.5" stroke-linejoin="round" />
+              <ns0:g class="mascot-scarf" transform="translate(6 -22)" fill="#3f7b7e" stroke="#30342f" stroke-width="3" stroke-linejoin="round">
+                <ns0:path class="scarf-tail scarf-tail-back" d="M84 151c4 8 8 15 14 21l7-6c-5-5-9-11-12-18Z" />
+                <ns0:path class="scarf-tail scarf-tail-front" d="M75 151c-3 9-4 18-3 27l9 1c0-9 1-17 3-26Z" />
+                <ns0:path d="M80 179h-9" fill="none" stroke-width="2" />
+                <ns0:ellipse cx="80" cy="148" rx="8.5" ry="7" />
+              </ns0:g>
+              <ns0:g class="mascot-eyes">
+                <ns0:ellipse cx="85" cy="81" rx="18" ry="24" fill="#fffaf1" stroke="#30342f" stroke-width="3.5" />
+                <ns0:ellipse cx="129" cy="78" rx="18" ry="24" fill="#fffaf1" stroke="#30342f" stroke-width="3.5" />
+                <ns0:g class="mascot-gaze">
+                  <ns0:g class="mascot-pupils" fill="#30342f">
+                    <ns0:ellipse cx="90" cy="84" rx="6" ry="10" />
+                    <ns0:ellipse cx="134" cy="81" rx="6" ry="10" />
+                    <ns0:circle cx="92.5" cy="79" r="2.4" fill="white" /><ns0:circle cx="136.5" cy="76" r="2.4" fill="white" />
+                  </ns0:g>
+                </ns0:g>
+              </ns0:g>
+              <ns0:path class="mascot-smile" d="M99 113c7 5 15 4 20-2" fill="none" stroke="#30342f" stroke-width="4" stroke-linecap="round" />
+              </ns0:g>
+          </ns0:g>
+          </ns0:svg><text x="128" y="315" text-anchor="middle" font-family="Arial,sans-serif" font-size="17" font-weight="700" fill="#30342f">1  Short &amp; neat</text><rect x="253" y="65" width="216" height="265" rx="20" fill="#fffdf8" stroke="#d8d7cf" stroke-width="2"/><ns0:svg xmlns:ns0="http://www.w3.org/2000/svg" viewBox="20 10 176 194" aria-hidden="true" x="269" y="74" width="186" height="218">
+          <ns0:g class="mascot-body">
+            <ns0:g class="mascot-legs" fill="none" stroke="#30342f" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+              <ns0:path class="mascot-leg-left" d="M78 151 Q74 169 64 181 Q54 188 46 183" />
+              <ns0:path class="mascot-leg-right" d="M132 151 Q140 169 150 181 Q160 188 168 183" />
+            </ns0:g>
+            <ns0:g class="mascot-top">
+              <ns0:path class="mascot-arm-left" d="M54 112c-18 4-23 15-28 24" fill="none" stroke="#30342f" stroke-width="4.5" stroke-linecap="round" />
+              <ns0:path d="M161 108c13-2 20 4 24 15" fill="none" stroke="#30342f" stroke-width="4.5" stroke-linecap="round" /><ns0:defs><ns0:clipPath id="shumi-body"><ns0:path d="M58 139c-20-10-27-29-22-47-7-19 2-34 19-39-2-24 14-38 33-30 9-21 33-21 42-1 23-5 40 11 35 31 21 7 28 24 18 42 8 22-5 42-25 47-20 18-77 18-100-3Z" /></ns0:clipPath></ns0:defs>
+              <ns0:path d="M58 139c-20-10-27-29-22-47-7-19 2-34 19-39-2-24 14-38 33-30 9-21 33-21 42-1 23-5 40 11 35 31 21 7 28 24 18 42 8 22-5 42-25 47-20 18-77 18-100-3Z" fill="#ee9878" />
+              <ns0:g clip-path="url(#shumi-body)">
+                <ns0:path d="M196 60c-6 50-40 92-110 100 30 14 80 12 120-20Z" fill="#d9775b" />
+                <ns0:path d="M54 66c4-14 14-22 26-24m28-16c8-6 18-7 26-2" fill="none" stroke="#fbc3ab" stroke-width="5" stroke-linecap="round" />
+              </ns0:g>
+              <ns0:g clip-path="url(#shumi-body)">
+                <ns0:path d="M10 94c50 40 150 40 210-6v11c-60 46-160 46-210 6Z" fill="#3f7b7e" />
+                <ns0:path d="M10 100c50 40 150 40 210-6v5c-60 46-160 46-210 6Z" fill="#2f6466" />
+                <ns0:path d="M10 94c50 40 150 40 210-6M10 105c50 40 150 40 210-6" fill="none" stroke="#30342f" stroke-width="3" />
+              </ns0:g>
+              <ns0:path d="M58 139c-20-10-27-29-22-47-7-19 2-34 19-39-2-24 14-38 33-30 9-21 33-21 42-1 23-5 40 11 35 31 21 7 28 24 18 42 8 22-5 42-25 47-20 18-77 18-100-3Z" fill="none" stroke="#30342f" stroke-width="4.5" stroke-linejoin="round" />
+              <ns0:g class="mascot-scarf" transform="translate(6 -22)" fill="#3f7b7e" stroke="#30342f" stroke-width="3" stroke-linejoin="round">
+                <ns0:path class="scarf-tail scarf-tail-back" d="M84 151c4 8 8 15 14 21l7-6c-5-5-9-11-12-18Z" />
+                <ns0:path class="scarf-tail scarf-tail-front" d="M75 151c-3 9-4 18-3 27l9 1c0-9 1-17 3-26Z" />
+                <ns0:path d="M80 179h-9" fill="none" stroke-width="2" />
+                <ns0:ellipse cx="80" cy="148" rx="8.5" ry="7" />
+              </ns0:g>
+              <ns0:g class="mascot-eyes">
+                <ns0:ellipse cx="85" cy="81" rx="18" ry="24" fill="#fffaf1" stroke="#30342f" stroke-width="3.5" />
+                <ns0:ellipse cx="129" cy="78" rx="18" ry="24" fill="#fffaf1" stroke="#30342f" stroke-width="3.5" />
+                <ns0:g class="mascot-gaze">
+                  <ns0:g class="mascot-pupils" fill="#30342f">
+                    <ns0:ellipse cx="90" cy="84" rx="6" ry="10" />
+                    <ns0:ellipse cx="134" cy="81" rx="6" ry="10" />
+                    <ns0:circle cx="92.5" cy="79" r="2.4" fill="white" /><ns0:circle cx="136.5" cy="76" r="2.4" fill="white" />
+                  </ns0:g>
+                </ns0:g>
+              </ns0:g>
+              <ns0:path class="mascot-smile" d="M99 113c7 5 15 4 20-2" fill="none" stroke="#30342f" stroke-width="4" stroke-linecap="round" />
+              </ns0:g>
+          </ns0:g>
+          </ns0:svg><text x="361" y="315" text-anchor="middle" font-family="Arial,sans-serif" font-size="17" font-weight="700" fill="#30342f">2  Soft feet</text><rect x="486" y="65" width="216" height="265" rx="20" fill="#fffdf8" stroke="#d8d7cf" stroke-width="2"/><ns0:svg xmlns:ns0="http://www.w3.org/2000/svg" viewBox="20 10 176 194" aria-hidden="true" x="502" y="74" width="186" height="218">
+          <ns0:g class="mascot-body">
+            <ns0:g class="mascot-legs" fill="none" stroke="#30342f" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+              <ns0:path class="mascot-leg-left" d="M78 151 L71 169 L76 177 L60 187 H48" />
+              <ns0:path class="mascot-leg-right" d="M132 151 L141 169 L136 177 L152 187 H164" />
+            </ns0:g>
+            <ns0:g class="mascot-top">
+              <ns0:path class="mascot-arm-left" d="M54 112c-18 4-23 15-28 24" fill="none" stroke="#30342f" stroke-width="4.5" stroke-linecap="round" />
+              <ns0:path d="M161 108c13-2 20 4 24 15" fill="none" stroke="#30342f" stroke-width="4.5" stroke-linecap="round" /><ns0:defs><ns0:clipPath id="shumi-body"><ns0:path d="M58 139c-20-10-27-29-22-47-7-19 2-34 19-39-2-24 14-38 33-30 9-21 33-21 42-1 23-5 40 11 35 31 21 7 28 24 18 42 8 22-5 42-25 47-20 18-77 18-100-3Z" /></ns0:clipPath></ns0:defs>
+              <ns0:path d="M58 139c-20-10-27-29-22-47-7-19 2-34 19-39-2-24 14-38 33-30 9-21 33-21 42-1 23-5 40 11 35 31 21 7 28 24 18 42 8 22-5 42-25 47-20 18-77 18-100-3Z" fill="#ee9878" />
+              <ns0:g clip-path="url(#shumi-body)">
+                <ns0:path d="M196 60c-6 50-40 92-110 100 30 14 80 12 120-20Z" fill="#d9775b" />
+                <ns0:path d="M54 66c4-14 14-22 26-24m28-16c8-6 18-7 26-2" fill="none" stroke="#fbc3ab" stroke-width="5" stroke-linecap="round" />
+              </ns0:g>
+              <ns0:g clip-path="url(#shumi-body)">
+                <ns0:path d="M10 94c50 40 150 40 210-6v11c-60 46-160 46-210 6Z" fill="#3f7b7e" />
+                <ns0:path d="M10 100c50 40 150 40 210-6v5c-60 46-160 46-210 6Z" fill="#2f6466" />
+                <ns0:path d="M10 94c50 40 150 40 210-6M10 105c50 40 150 40 210-6" fill="none" stroke="#30342f" stroke-width="3" />
+              </ns0:g>
+              <ns0:path d="M58 139c-20-10-27-29-22-47-7-19 2-34 19-39-2-24 14-38 33-30 9-21 33-21 42-1 23-5 40 11 35 31 21 7 28 24 18 42 8 22-5 42-25 47-20 18-77 18-100-3Z" fill="none" stroke="#30342f" stroke-width="4.5" stroke-linejoin="round" />
+              <ns0:g class="mascot-scarf" transform="translate(6 -22)" fill="#3f7b7e" stroke="#30342f" stroke-width="3" stroke-linejoin="round">
+                <ns0:path class="scarf-tail scarf-tail-back" d="M84 151c4 8 8 15 14 21l7-6c-5-5-9-11-12-18Z" />
+                <ns0:path class="scarf-tail scarf-tail-front" d="M75 151c-3 9-4 18-3 27l9 1c0-9 1-17 3-26Z" />
+                <ns0:path d="M80 179h-9" fill="none" stroke-width="2" />
+                <ns0:ellipse cx="80" cy="148" rx="8.5" ry="7" />
+              </ns0:g>
+              <ns0:g class="mascot-eyes">
+                <ns0:ellipse cx="85" cy="81" rx="18" ry="24" fill="#fffaf1" stroke="#30342f" stroke-width="3.5" />
+                <ns0:ellipse cx="129" cy="78" rx="18" ry="24" fill="#fffaf1" stroke="#30342f" stroke-width="3.5" />
+                <ns0:g class="mascot-gaze">
+                  <ns0:g class="mascot-pupils" fill="#30342f">
+                    <ns0:ellipse cx="90" cy="84" rx="6" ry="10" />
+                    <ns0:ellipse cx="134" cy="81" rx="6" ry="10" />
+                    <ns0:circle cx="92.5" cy="79" r="2.4" fill="white" /><ns0:circle cx="136.5" cy="76" r="2.4" fill="white" />
+                  </ns0:g>
+                </ns0:g>
+              </ns0:g>
+              <ns0:path class="mascot-smile" d="M99 113c7 5 15 4 20-2" fill="none" stroke="#30342f" stroke-width="4" stroke-linecap="round" />
+              </ns0:g>
+          </ns0:g>
+          </ns0:svg><text x="594" y="315" text-anchor="middle" font-family="Arial,sans-serif" font-size="17" font-weight="700" fill="#30342f">3  Bendy knees</text><rect x="719" y="65" width="216" height="265" rx="20" fill="#fffdf8" stroke="#d8d7cf" stroke-width="2"/><ns0:svg xmlns:ns0="http://www.w3.org/2000/svg" viewBox="20 10 176 194" aria-hidden="true" x="735" y="74" width="186" height="218">
+          <ns0:g class="mascot-body">
+            <ns0:g class="mascot-legs" fill="none" stroke="#30342f" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+              <ns0:path class="mascot-leg-left" d="M78 151 Q69 170 51 186 H39" />
+              <ns0:path class="mascot-leg-right" d="M132 151 Q144 170 162 186 H174" />
+            </ns0:g>
+            <ns0:g class="mascot-top">
+              <ns0:path class="mascot-arm-left" d="M54 112c-18 4-23 15-28 24" fill="none" stroke="#30342f" stroke-width="4.5" stroke-linecap="round" />
+              <ns0:path d="M161 108c13-2 20 4 24 15" fill="none" stroke="#30342f" stroke-width="4.5" stroke-linecap="round" /><ns0:defs><ns0:clipPath id="shumi-body"><ns0:path d="M58 139c-20-10-27-29-22-47-7-19 2-34 19-39-2-24 14-38 33-30 9-21 33-21 42-1 23-5 40 11 35 31 21 7 28 24 18 42 8 22-5 42-25 47-20 18-77 18-100-3Z" /></ns0:clipPath></ns0:defs>
+              <ns0:path d="M58 139c-20-10-27-29-22-47-7-19 2-34 19-39-2-24 14-38 33-30 9-21 33-21 42-1 23-5 40 11 35 31 21 7 28 24 18 42 8 22-5 42-25 47-20 18-77 18-100-3Z" fill="#ee9878" />
+              <ns0:g clip-path="url(#shumi-body)">
+                <ns0:path d="M196 60c-6 50-40 92-110 100 30 14 80 12 120-20Z" fill="#d9775b" />
+                <ns0:path d="M54 66c4-14 14-22 26-24m28-16c8-6 18-7 26-2" fill="none" stroke="#fbc3ab" stroke-width="5" stroke-linecap="round" />
+              </ns0:g>
+              <ns0:g clip-path="url(#shumi-body)">
+                <ns0:path d="M10 94c50 40 150 40 210-6v11c-60 46-160 46-210 6Z" fill="#3f7b7e" />
+                <ns0:path d="M10 100c50 40 150 40 210-6v5c-60 46-160 46-210 6Z" fill="#2f6466" />
+                <ns0:path d="M10 94c50 40 150 40 210-6M10 105c50 40 150 40 210-6" fill="none" stroke="#30342f" stroke-width="3" />
+              </ns0:g>
+              <ns0:path d="M58 139c-20-10-27-29-22-47-7-19 2-34 19-39-2-24 14-38 33-30 9-21 33-21 42-1 23-5 40 11 35 31 21 7 28 24 18 42 8 22-5 42-25 47-20 18-77 18-100-3Z" fill="none" stroke="#30342f" stroke-width="4.5" stroke-linejoin="round" />
+              <ns0:g class="mascot-scarf" transform="translate(6 -22)" fill="#3f7b7e" stroke="#30342f" stroke-width="3" stroke-linejoin="round">
+                <ns0:path class="scarf-tail scarf-tail-back" d="M84 151c4 8 8 15 14 21l7-6c-5-5-9-11-12-18Z" />
+                <ns0:path class="scarf-tail scarf-tail-front" d="M75 151c-3 9-4 18-3 27l9 1c0-9 1-17 3-26Z" />
+                <ns0:path d="M80 179h-9" fill="none" stroke-width="2" />
+                <ns0:ellipse cx="80" cy="148" rx="8.5" ry="7" />
+              </ns0:g>
+              <ns0:g class="mascot-eyes">
+                <ns0:ellipse cx="85" cy="81" rx="18" ry="24" fill="#fffaf1" stroke="#30342f" stroke-width="3.5" />
+                <ns0:ellipse cx="129" cy="78" rx="18" ry="24" fill="#fffaf1" stroke="#30342f" stroke-width="3.5" />
+                <ns0:g class="mascot-gaze">
+                  <ns0:g class="mascot-pupils" fill="#30342f">
+                    <ns0:ellipse cx="90" cy="84" rx="6" ry="10" />
+                    <ns0:ellipse cx="134" cy="81" rx="6" ry="10" />
+                    <ns0:circle cx="92.5" cy="79" r="2.4" fill="white" /><ns0:circle cx="136.5" cy="76" r="2.4" fill="white" />
+                  </ns0:g>
+                </ns0:g>
+              </ns0:g>
+              <ns0:path class="mascot-smile" d="M99 113c7 5 15 4 20-2" fill="none" stroke="#30342f" stroke-width="4" stroke-linecap="round" />
+              </ns0:g>
+          </ns0:g>
+          </ns0:svg><text x="827" y="315" text-anchor="middle" font-family="Arial,sans-serif" font-size="17" font-weight="700" fill="#30342f">4  Wide stance</text><rect x="952" y="65" width="216" height="265" rx="20" fill="#fffdf8" stroke="#d8d7cf" stroke-width="2"/><ns0:svg xmlns:ns0="http://www.w3.org/2000/svg" viewBox="20 10 176 194" aria-hidden="true" x="968" y="74" width="186" height="218">
+          <ns0:g class="mascot-body">
+            <ns0:g class="mascot-legs" fill="none" stroke="#30342f" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+              <ns0:path class="mascot-leg-left" d="M78 151 Q75 164 68 171 H59" />
+              <ns0:path class="mascot-leg-right" d="M132 151 Q137 164 145 171 H154" />
+            </ns0:g>
+            <ns0:g class="mascot-top">
+              <ns0:path class="mascot-arm-left" d="M54 112c-18 4-23 15-28 24" fill="none" stroke="#30342f" stroke-width="4.5" stroke-linecap="round" />
+              <ns0:path d="M161 108c13-2 20 4 24 15" fill="none" stroke="#30342f" stroke-width="4.5" stroke-linecap="round" /><ns0:defs><ns0:clipPath id="shumi-body"><ns0:path d="M58 139c-20-10-27-29-22-47-7-19 2-34 19-39-2-24 14-38 33-30 9-21 33-21 42-1 23-5 40 11 35 31 21 7 28 24 18 42 8 22-5 42-25 47-20 18-77 18-100-3Z" /></ns0:clipPath></ns0:defs>
+              <ns0:path d="M58 139c-20-10-27-29-22-47-7-19 2-34 19-39-2-24 14-38 33-30 9-21 33-21 42-1 23-5 40 11 35 31 21 7 28 24 18 42 8 22-5 42-25 47-20 18-77 18-100-3Z" fill="#ee9878" />
+              <ns0:g clip-path="url(#shumi-body)">
+                <ns0:path d="M196 60c-6 50-40 92-110 100 30 14 80 12 120-20Z" fill="#d9775b" />
+                <ns0:path d="M54 66c4-14 14-22 26-24m28-16c8-6 18-7 26-2" fill="none" stroke="#fbc3ab" stroke-width="5" stroke-linecap="round" />
+              </ns0:g>
+              <ns0:g clip-path="url(#shumi-body)">
+                <ns0:path d="M10 94c50 40 150 40 210-6v11c-60 46-160 46-210 6Z" fill="#3f7b7e" />
+                <ns0:path d="M10 100c50 40 150 40 210-6v5c-60 46-160 46-210 6Z" fill="#2f6466" />
+                <ns0:path d="M10 94c50 40 150 40 210-6M10 105c50 40 150 40 210-6" fill="none" stroke="#30342f" stroke-width="3" />
+              </ns0:g>
+              <ns0:path d="M58 139c-20-10-27-29-22-47-7-19 2-34 19-39-2-24 14-38 33-30 9-21 33-21 42-1 23-5 40 11 35 31 21 7 28 24 18 42 8 22-5 42-25 47-20 18-77 18-100-3Z" fill="none" stroke="#30342f" stroke-width="4.5" stroke-linejoin="round" />
+              <ns0:g class="mascot-scarf" transform="translate(6 -22)" fill="#3f7b7e" stroke="#30342f" stroke-width="3" stroke-linejoin="round">
+                <ns0:path class="scarf-tail scarf-tail-back" d="M84 151c4 8 8 15 14 21l7-6c-5-5-9-11-12-18Z" />
+                <ns0:path class="scarf-tail scarf-tail-front" d="M75 151c-3 9-4 18-3 27l9 1c0-9 1-17 3-26Z" />
+                <ns0:path d="M80 179h-9" fill="none" stroke-width="2" />
+                <ns0:ellipse cx="80" cy="148" rx="8.5" ry="7" />
+              </ns0:g>
+              <ns0:g class="mascot-eyes">
+                <ns0:ellipse cx="85" cy="81" rx="18" ry="24" fill="#fffaf1" stroke="#30342f" stroke-width="3.5" />
+                <ns0:ellipse cx="129" cy="78" rx="18" ry="24" fill="#fffaf1" stroke="#30342f" stroke-width="3.5" />
+                <ns0:g class="mascot-gaze">
+                  <ns0:g class="mascot-pupils" fill="#30342f">
+                    <ns0:ellipse cx="90" cy="84" rx="6" ry="10" />
+                    <ns0:ellipse cx="134" cy="81" rx="6" ry="10" />
+                    <ns0:circle cx="92.5" cy="79" r="2.4" fill="white" /><ns0:circle cx="136.5" cy="76" r="2.4" fill="white" />
+                  </ns0:g>
+                </ns0:g>
+              </ns0:g>
+              <ns0:path class="mascot-smile" d="M99 113c7 5 15 4 20-2" fill="none" stroke="#30342f" stroke-width="4" stroke-linecap="round" />
+              </ns0:g>
+          </ns0:g>
+          </ns0:svg><text x="1060" y="315" text-anchor="middle" font-family="Arial,sans-serif" font-size="17" font-weight="700" fill="#30342f">5  Tiny steps</text></svg>

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" id="shumi" viewBox="0 0 220 210">
+  <g fill="none" stroke="#30342f" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M78 151c-1 19-6 29-15 40h-13m82-41c3 14 7 26 16 36h15"/>
+    <path d="M54 112c-18 4-23 15-28 24m135-28c15-4 24-16 27-33"/>
+    <path d="m179 77 9-2 5-9"/>
+  </g>
+  <path d="M58 139c-20-10-27-29-22-47-7-19 2-34 19-39-2-24 14-38 33-30 9-21 33-21 42-1 23-5 40 11 35 31 21 7 28 24 18 42 8 22-5 42-25 47-20 18-77 18-100-3Z" fill="#ee9878"/>
+  <path d="M59 139c21 12 63 14 93 2" fill="none" stroke="#3f7b7e" stroke-width="13" stroke-linecap="round"/>
+  <path d="M70 145c-8 9-17 13-30 11l7 11c17 2 28-6 36-19Z" fill="#3f7b7e"/>
+  <ellipse cx="85" cy="81" rx="18" ry="24" fill="#fffaf1"/>
+  <ellipse cx="129" cy="78" rx="18" ry="24" fill="#fffaf1"/>
+  <ellipse cx="90" cy="84" rx="6" ry="10" fill="#30342f"/>
+  <ellipse cx="134" cy="81" rx="6" ry="10" fill="#30342f"/>
+  <path d="M99 113c7 5 15 4 20-2" fill="none" stroke="#30342f" stroke-width="4" stroke-linecap="round"/>
+</svg>
