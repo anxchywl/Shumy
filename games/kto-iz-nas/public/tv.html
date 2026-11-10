@@ -270,6 +270,11 @@
     .game-panel { height:auto; }
     .game-panel-views { flex:none; height:24rem; }
   }
+  @media (min-width:62.01rem) {
+    html[data-embed] #s-lobby { padding:2rem 1.5rem; }
+    html[data-embed] .lobby { margin-top:0; }
+    html[data-embed] .lobby-room, html[data-embed] .game-panel { height:min(35rem, calc(100dvh - 4rem)); }
+  }
   @media (prefers-reduced-motion:reduce) { .row .fill,.btn,.pill,.invite-panel,.invite-link,.lobby-room,.game-panel,.game-tile,.game-tile-ribbon,.game-grid,.game-settings,.game-tile-art,.game-tile-description,.panel-action,.panel-action svg,.seg button,.room-code span,.settings-label,.start-hint,.waiting-art { transition:none; } .screen.on,.wait-guy,.wait-dots circle { animation:none; } }
 </style>
 </head>
