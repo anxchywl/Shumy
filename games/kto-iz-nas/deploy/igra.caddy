@@ -1,0 +1,13 @@
+# replace the example hostname with a domain you control
+games.example.com {
+    redir /game /game/ 308
+
+    handle_path /game/* {
+        header {
+            Referrer-Policy no-referrer
+            X-Content-Type-Options nosniff
+            X-Frame-Options DENY
+        }
+        reverse_proxy party-game:5181
+    }
+}
