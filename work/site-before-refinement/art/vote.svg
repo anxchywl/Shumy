@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 248">
+  <defs>
+    <pattern id="grain" width="12" height="12" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" fill="#713c3c"/>
+    </pattern>
+  </defs>
+  <path fill="#f6ac8f" d="M0 0h600v248H0z"/>
+  <path fill="url(#grain)" opacity=".22" d="M0 0h600v248H0z"/>
+  <ellipse cx="300" cy="132" rx="258" ry="74" transform="rotate(-8 300 132)" fill="none" stroke="#a15d53" stroke-width="1.5"/>
+  <g stroke="#201b24" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+    <g transform="rotate(-13 143 126)">
+      <rect x="86" y="64" width="116" height="124" rx="22" fill="#ffe1c9"/>
+      <path d="M103 153c0-25 12-41 39-41 23 0 38 15 38 41" fill="#c0b0eb"/>
+      <path d="M117 116v-13l15 9m20 0 13-10v17" fill="#c0b0eb"/>
+      <path d="M128 132v5m23-5v5m-19 11c4 3 8 3 12 0" fill="none" stroke-width="3"/>
+    </g>
+    <g transform="rotate(13 462 126)">
+      <rect x="404" y="64" width="116" height="124" rx="22" fill="#ffe1c9"/>
+      <path d="M422 151c3-27 16-40 39-40s36 13 40 40" fill="#f6ac8f"/>
+      <path d="M443 112c-11-22 9-23 17-12 10-12 30-9 21 15" fill="#f6ac8f"/>
+      <path d="M446 134c2-4 6-4 8 0m15 0c2-4 6-4 8 0m-21 9c4 5 8 5 12 0" fill="none" stroke-width="3"/>
+    </g>
+    <rect x="230" y="33" width="145" height="171" rx="24" fill="#b47770"/>
+    <rect x="225" y="26" width="145" height="171" rx="24" fill="#dcef8c"/>
+    <path d="M248 162c0-34 19-53 49-53s50 19 50 53z" fill="#c0b0eb"/>
+    <path d="M265 119l-6-23 24 16m24-2 23-16-5 27" fill="#c0b0eb"/>
+    <circle cx="285" cy="135" r="4" fill="#201b24" stroke="none"/>
+    <circle cx="309" cy="135" r="4" fill="#201b24" stroke="none"/>
+    <path d="M291 146c4 4 8 4 12 0" fill="none" stroke-width="3"/>
+    <path d="M297 46v32m-16-16h32" stroke-width="2.5"/>
+    <circle cx="369" cy="185" r="24" fill="#f8f0e5"/>
+    <path d="m357 185 8 8 15-17" fill="none"/>
+  </g>
+  <g fill="#201b24">
+    <circle cx="46" cy="103" r="4"/>
+    <circle cx="553" cy="146" r="5"/>
+    <circle cx="176" cy="215" r="3"/>
+    <circle cx="425" cy="36" r="4"/>
+  </g>
+</svg>

@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="ru" id="top">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Шум. Игры для компании с общим экраном и телефонами. Голосуйте, рисуйте и угадывайте вместе.">
+  <meta name="theme-color" content="#f9f8f4">
+  <title>Шум. Игры для компании</title>
+  <link rel="icon" href="art/mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="motion.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Перейти к содержанию</a>
+  <div class="drifters" aria-hidden="true">
+    <span style="--x:2%;--y:25%;--w:64px;--h:64px;--turn:-22deg;--color:#a9654b"><svg viewBox="0 0 80 80"><use href="art/objects.svg#pencil"/></svg></span>
+    <span style="--x:92%;--y:15%;--w:50px;--h:50px;--turn:18deg;--color:#527b6a"><svg viewBox="0 0 80 80"><use href="art/objects.svg#dice"/></svg></span>
+    <span style="--x:94%;--y:51%;--w:52px;--h:52px;--turn:-12deg;--color:#8e769d"><svg viewBox="0 0 80 80"><use href="art/objects.svg#speech"/></svg></span>
+    <span style="--x:1%;--y:69%;--w:54px;--h:54px;--turn:-16deg;--color:#527b6a"><svg viewBox="0 0 80 80"><use href="art/objects.svg#cards"/></svg></span>
+    <span style="--x:88%;--y:85%;--w:64px;--h:42px;--turn:16deg;--color:#a9654b"><svg viewBox="0 0 80 80"><use href="art/objects.svg#squiggle"/></svg></span>
+    <span style="--x:7%;--y:92%;--w:42px;--h:52px;--turn:-12deg;--color:#9c8245"><svg viewBox="0 0 80 80"><use href="art/objects.svg#question"/></svg></span>
+  </div>
+
+  <header class="shell masthead">
+    <a class="wordmark" href="./"><img src="art/mark.svg" width="38" height="38" alt="">Шум</a>
+    <nav aria-label="Навигация">
+      <a href="#games">Игры</a>
+      <a href="#start">Как начать</a>
+    </nav>
+    <a class="join-link" href="https://anxchywl.dev/igra/">Я игрок <span aria-hidden="true">↗</span></a>
+  </header>
+
+  <main id="main" tabindex="-1" class="shell">
+    <section class="hero" aria-labelledby="page-title">
+      <div class="hero-copy">
+        <h1 id="page-title">Собрались?<br>Давайте играть.</h1>
+        <p>Один общий экран. Телефон у каждого.<br>И вся компания в игре.</p>
+        <a class="action" href="#games">Посмотреть игры <span aria-hidden="true">↓</span></a>
+      </div>
+      <figure class="mascot">
+        <img src="art/mascot.svg" width="220" height="210" alt="Шуми, округлый оранжевый персонаж с тонкими руками и бирюзовым шарфом">
+        <figcaption>Это Шуми. Он уже здесь.</figcaption>
+      </figure>
+    </section>
+
+    <section class="section" id="games" aria-labelledby="games-title">
+      <div class="section-head"><h2 id="games-title">Во что играем?</h2><span>Доступно сейчас</span></div>
+      <div class="available-games">
+        <article class="game-card available">
+          <a class="game-link" href="#start" aria-label="Кто из нас? Как начать" aria-describedby="vote-description vote-note">
+            <div class="game-art peach"><img src="art/vote.svg" width="560" height="220" alt=""></div>
+            <div class="game-copy">
+              <div class="game-title"><h3>Кто из нас?</h3><span class="card-arrow" aria-hidden="true">↗</span></div>
+              <p id="vote-description">Выбирайте друзей в ответ на провокационные вопросы. Узнайте, кто совпал с мнением компании.</p>
+              <span class="game-note" id="vote-note">Есть вопросы на взрослые темы</span>
+            </div>
+          </a>
+        </article>
+        <article class="game-card available">
+          <a class="game-link" href="#start" aria-label="Рисуй и угадывай. Как начать" aria-describedby="draw-description draw-note">
+            <div class="game-art sage"><img src="art/draw.svg" width="560" height="220" alt=""></div>
+            <div class="game-copy">
+              <div class="game-title"><h3>Рисуй и угадывай</h3><span class="card-arrow" aria-hidden="true">↗</span></div>
+              <p id="draw-description">Один рисует секретное слово. Остальные угадывают с телефонов. Художественный талант по желанию.</p>
+              <span class="game-note" id="draw-note">Каждый побывает художником</span>
+            </div>
+          </a>
+        </article>
+      </div>
+
+      <section class="start" id="start" aria-labelledby="start-title">
+        <div>
+          <h3 id="start-title">Общий экран, и можно начинать</h3>
+          <p>Ведущий входит с логином <code>host</code> и паролем, затем выбирает игру в лобби. Остальные сканируют QR‑код с экрана.</p>
+        </div>
+        <a class="action" href="https://anxchywl.dev/igra/tv">Открыть лобби <span aria-hidden="true">↗</span></a>
+      </section>
+    </section>
+
+    <section class="section upcoming" aria-labelledby="upcoming-title">
+      <div class="section-head"><h2 id="upcoming-title">В планах</h2><span>10 игр</span></div>
+      <ul class="game-grid" role="list">
+        <li class="game-card">
+          <div class="game-art sage"><svg viewBox="0 0 160 104" aria-hidden="true"><use href="art/games.svg#crowd"/></svg></div>
+          <div class="game-copy">
+            <div class="game-title"><h3>Угадай зал</h3><span class="status">Скоро</span></div>
+            <p>Ответь на вопрос и угадай, какой вариант выберет большинство.</p>
+          </div>
+        </li>
+        <li class="game-card">
+          <div class="game-art peach"><svg viewBox="0 0 160 104" aria-hidden="true"><use href="art/games.svg#duel"/></svg></div>
+          <div class="game-copy">
+            <div class="game-title"><h3>Дуэль нелепых ответов</h3><span class="status">Скоро</span></div>
+            <p>Двое заканчивают одну фразу. Зал выбирает самый смешной ответ.</p>
+          </div>
+        </li>
+        <li class="game-card">
+          <div class="game-art lavender"><svg viewBox="0 0 160 104" aria-hidden="true"><use href="art/games.svg#telephone"/></svg></div>
+          <div class="game-copy">
+            <div class="game-title"><h3>Телефон без слов</h3><span class="status">Скоро</span></div>
+            <p>Фраза становится рисунком, рисунок становится новой фразой. В конце смотрим всю цепочку.</p>
+          </div>
+        </li>
+        <li class="game-card">
+          <div class="game-art sand"><svg viewBox="0 0 160 104" aria-hidden="true"><use href="art/games.svg#impostor"/></svg></div>
+          <div class="game-copy">
+            <div class="game-title"><h3>Самозванец</h3><span class="status">Скоро</span></div>
+            <p>Все выполняют одно задание, но один игрок его не видел. Найдите его по ответам.</p>
+          </div>
+        </li>
+        <li class="game-card">
+          <div class="game-art sage"><svg viewBox="0 0 160 104" aria-hidden="true"><use href="art/games.svg#dictionary"/></svg></div>
+          <div class="game-copy">
+            <div class="game-title"><h3>Фальшивое определение</h3><span class="status">Скоро</span></div>
+            <p>Сочини значение редкого слова и попробуй найти настоящее среди чужих версий.</p>
+          </div>
+        </li>
+        <li class="game-card">
+          <div class="game-art sand"><svg viewBox="0 0 160 104" aria-hidden="true"><use href="art/games.svg#gesture"/></svg></div>
+          <div class="game-copy">
+            <div class="game-title"><h3>Покажи, не говори</h3><span class="status">Скоро</span></div>
+            <p>Покажи секретное слово жестами. Остальные угадывают с телефонов.</p>
+          </div>
+        </li>
+        <li class="game-card">
+          <div class="game-art lavender"><svg viewBox="0 0 160 104" aria-hidden="true"><use href="art/games.svg#quiz"/></svg></div>
+          <div class="game-copy">
+            <div class="game-title"><h3>Квиз с уверенностью</h3><span class="status">Скоро</span></div>
+            <p>Ответь на вопрос и поставь очки на свою уверенность в ответе.</p>
+          </div>
+        </li>
+        <li class="game-card">
+          <div class="game-art peach"><svg viewBox="0 0 160 104" aria-hidden="true"><use href="art/games.svg#monster"/></svg></div>
+          <div class="game-copy">
+            <div class="game-title"><h3>Монстр-подиум</h3><span class="status">Скоро</span></div>
+            <p>Собери монстра под заданную ситуацию. Зал присудит титулы.</p>
+          </div>
+        </li>
+        <li class="game-card">
+          <div class="game-art sand"><svg viewBox="0 0 160 104" aria-hidden="true"><use href="art/games.svg#auction"/></svg></div>
+          <div class="game-copy">
+            <div class="game-title"><h3>Аукцион абсурда</h3><span class="status">Скоро</span></div>
+            <p>Поставь игровые жетоны на прогноз о привычках компании.</p>
+          </div>
+        </li>
+        <li class="game-card">
+          <div class="game-art sage"><svg viewBox="0 0 160 104" aria-hidden="true"><use href="art/games.svg#tower"/></svg></div>
+          <div class="game-copy">
+            <div class="game-title"><h3>Спасите башню</h3><span class="status">Скоро</span></div>
+            <p>Стройте башню верными ответами и попробуйте удержать её до конца раунда.</p>
+          </div>
+        </li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="shell footer">
+    <span class="wordmark"><img src="art/mark.svg" width="28" height="28" alt="">Шум</span>
+    <div class="footer-actions">
+      <button id="motion-toggle" type="button" aria-pressed="true" hidden>Анимация <span aria-hidden="true">вкл.</span></button>
+      <a href="#top">Наверх ↑</a>
+    </div>
+  </footer>
+</body>
+</html>
