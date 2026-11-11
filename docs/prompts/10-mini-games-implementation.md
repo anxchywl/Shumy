@@ -1,8 +1,23 @@
-# Step-by-step implementation prompt: “Wrong Dub”
+# Step-by-step implementation prompt: ten new Shumy mini-games
 
-Use this prompt to plan and implement a playable “Wrong Dub” mode for Shumy. Work in the existing project and preserve its architecture, game modes, visual identity, and user changes. Do not deploy, change server configuration, or publish anything.
+Use this prompt to implement ten new playable Shumy mini-games in the existing project. The current “Who’s Most Likely?” and “Draw and Guess” modes already exist: preserve them and do not rebuild them. “Wrong Dub” is one of the ten new games, not the whole scope. Implement the games in small, reviewable phases, keeping each one playable before starting the next. Preserve the existing architecture, visual identity, and user changes. Do not deploy, change server configuration, or publish anything.
 
 ## Product brief
+
+The ten new modes in scope are:
+
+1. Wrong Dub
+2. Guess the Crowd
+3. Duel of Absurd Answers
+4. Telephone Without Words
+5. The Impostor
+6. Fake Definition
+7. Show, Don’t Tell
+8. Confident Quiz
+9. Monster Runway
+10. Save the Tower
+
+Each mode must have its own clear core loop and player/host screens, while sharing Shumy’s room, identity, live-state, theme, and accessibility systems. Do not combine these into one configurable game or add extra modes beyond this list.
 
 Players record short voice lines for a silent scene, one role at a time. Shumy combines the takes with the scene, then the group watches the absurd new dub together. The joke comes from improvisation and mismatched dialogue, not from voice-acting skill.
 
@@ -33,9 +48,9 @@ Trace one existing game from host start to phone action to host result. Record:
 
 Identify blockers to audio recording and synchronized playback. Separate confirmed existing capabilities from assumptions. Do not begin by rewriting the room system.
 
-## Step 2: define the smallest playable vertical slice
+## Step 2: implement the first complete vertical slice
 
-Implement one original silent scene with four timed dialogue slots. Each participant gets at most one slot in the first pass. The loop is:
+Start with Wrong Dub: implement one original silent scene with four timed dialogue slots. This is game 1 of 10, not the stopping point. After it is playable, continue through the remaining nine modes in the order specified in Step 13, completing each mode before moving on. Each participant gets at most one slot in the first pass. The loop is:
 
 1. Host starts the round and sees the scene and slot count.
 2. Server assigns voice slots and opens recording in order.
@@ -222,13 +237,116 @@ For each step, state what you changed and how you verified it. Add tests only wh
 6. Verify host and player authorization, per-request size/duration limits, room cleanup, and that media cannot be fetched without room authorization.
 7. Check the audio format and flow on the supported target browsers and a weak network. Report exact browsers/devices and the remaining limitations; do not claim scale based on one local device.
 
+## Step 13: implement the other nine mini-games
+
+Reuse shared room and UI patterns, but keep each mode’s rules explicit. Each mode must have an accessible phone flow, a TV/host flow, a server-owned phase sequence, a clear end state, and recovery paths. Keep normal rounds short; when one player is taking a turn, the rest of the room should vote, guess, or see a clear waiting state.
+
+### 2. Guess the Crowd
+
+Everyone answers a playful multiple-choice question on their phone, then predicts which answer will be most popular. Reveal the crowd distribution only after answers lock. Award points for correct predictions; do not reward speed alone.
+
+- Host/TV: question, answer window, prediction window, then an aggregated chart and round result.
+- Phone: select one answer, lock it, then predict the leading answer. State clearly when answers become final.
+- Edge cases: fewer than two answers, tied leaders, no votes, a player joining after lock, duplicate submissions, and reconnect after the answer but before the prediction. Tied leaders count as a shared correct prediction unless a tie-break rule was shown before the round.
+- Never expose individual answers before the reveal. Limit options to authored content in the first version to avoid moderation work.
+
+### 3. Duel of Absurd Answers
+
+Two volunteers complete the same short prompt. The rest of the room votes for the answer they prefer. Reveal the authors after the vote closes.
+
+- Host/TV: show the prompt, two submission slots, anonymous answer cards, vote progress, then authors and result.
+- Phone: selected contestants submit a short answer; everyone else votes once. Make a contestant’s non-voting status clear.
+- Edge cases: not enough volunteers, a volunteer disconnecting before submit, one empty answer, duplicate text, late edits, no votes, and a tie. Allow the host to replace a disconnected contestant with a volunteer or use a neutral authored answer. Validate length and escape markup; provide host hide/replace controls before TV reveal.
+
+### 4. Telephone Without Words
+
+Create several short chains. In each chain, players alternate between drawing the previous player’s phrase and describing the previous drawing in one short sentence. At the end, show the chain from its original prompt to its final interpretation.
+
+- Host/TV: show chain count and progress, then reveal each chain one card at a time.
+- Phone: show only the previous contribution, a drawing surface or short text field as required, a clear deadline, and submit/skip controls.
+- Edge cases: not enough participants for a chain, more players than slots, missing middle contribution, player leaving mid-chain, empty drawing/text, multiple chains with different lengths, and duplicate retry after reconnect. Insert a labeled blank or authored fallback and continue; never silently reorder the chain. Do not reveal earlier chain steps to a player who has not submitted.
+
+### 5. The Impostor
+
+Split the room into small tables. Most players privately receive the same prompt; one receives a related but different prompt. Players take turns giving short clues, then vote for the suspected impostor. The impostor may guess the group’s prompt after the reveal.
+
+- Host/TV: show table and turn progress without displaying secret prompts. Phones reveal only that player’s private prompt and current action.
+- Phone: private prompt, one short clue, a vote, and—if selected as impostor—a final guess.
+- Edge cases: a table too small to hide a role, uneven table sizes, no eligible prompt pair, player joins after roles are assigned, a player disconnects, a missing clue, tied suspect votes, and an impostor guessing after the deadline. Assign roles on the server, avoid revealing them through public state, and use an authored fallback clue or allow a skip. For the MVP, require at least four players per table and explain when the game cannot start.
+
+### 6. Fake Definition
+
+Show a rare or invented word. Players write a plausible definition; include the real definition among the choices. The room votes for the definition it believes is real. Score players for correct guesses and for drawing votes to their believable fake definition.
+
+- Host/TV: show the word, then anonymized shuffled definitions, followed by the real answer and scoring.
+- Phone: submit one definition, lock it, then select the real definition. Do not identify an author before votes close.
+- Edge cases: duplicate submissions, a player copying the true definition, empty or invalid text, no real definition, no votes, ties, and reconnect between writing and voting. If duplicates collide, keep one choice and mark its contributors consistently; author display and scoring must not leak before reveal. Use a curated dictionary/prompt pack in the MVP rather than unreviewed open prompts.
+
+### 7. Show, Don’t Tell
+
+One volunteer acts out an assigned word without speaking. The rest of the room submits guesses on their phones. Rotate the actor between rounds and reveal accepted guesses or a short result when time ends.
+
+- Host/TV: identify the actor, show the turn timer and guess count, but keep the secret word off the shared screen until the reveal.
+- Actor phone: show the secret word and “Finish turn”. Audience phone: one guess field with a clear submit/try-again state.
+- Edge cases: no volunteer, actor disconnect, no guesses, multiple correct guesses, accidental duplicate, offensive/unsafe word, and the actor attempting to end after the deadline. Use curated words, accept at most one correct solve per player, and allow a non-verbal fallback illustration if the actor cannot perform.
+
+### 8. Confident Quiz
+
+All players answer a multiple-choice question and separately choose how confident they are. A correct answer earns more for higher confidence; a wrong answer loses the corresponding stake. Show the scoring rule before the first question.
+
+- Host/TV: question, answer timer, confidence lock, answer reveal, and score change.
+- Phone: choose an answer and confidence level; allow edits only until the shared answer deadline.
+- Edge cases: no answer, no confidence selection, a tie between choices, question with a bad/missing key, late action, and reconnect after lock. Default missing answers to zero points and no penalty; do not treat a missing response as a low-confidence wrong answer. Validate the question pack before a game starts.
+
+### 9. Monster Runway
+
+Each participant assembles a monster from Shumy’s existing safe avatar parts and may add a short caption. The TV presents entries in a simple gallery; players vote on a prompt-specific category such as “best disguise”.
+
+- Host/TV: show the category, a manageable gallery or rotating entries, then vote totals and recognition.
+- Phone: choose from bounded avatar parts, optionally enter one short caption, preview, and submit. Reuse the existing deterministic avatar system where available.
+- Edge cases: large rooms, no caption, duplicate avatar, invalid part identifier, player joining after submissions lock, no votes, and tied winners. Cap caption length, validate part identifiers server-side, and page/rotate gallery entries instead of shrinking them below readable size. Do not permit image uploads in the MVP.
+
+### 10. Save the Tower
+
+Divide players into teams. Each round, teammates answer a short question; a correct team answer adds a floor to a shared tower. Wrong answers remove stability or add a visible crack. The room works together to finish a target number of floors before the tower falls.
+
+- Host/TV: show team progress, tower state, current question, and a clear shared goal.
+- Phone: team answer selection, with one designated submitter or a defined team consensus rule. State which rule is active before the round.
+- Edge cases: uneven team sizes, a team with no connected players, simultaneous conflicting submissions, all teams wrong, a team reaching the goal at the deadline, ties, and reconnect. Make each team’s accepted answer singular and idempotent; do not let one disconnected team block all others. Stop cleanly when the tower falls or the goal is reached.
+
+## Step 14: define shared game contracts and the catalogue
+
+Represent each game with a stable ID, localized title/description, minimum player requirement, join/start eligibility, phase list, host actions, player actions, and result shape. Keep game-specific rules in their own module or the smallest existing equivalent; do not build a generic rules engine for ten different games.
+
+Make the catalogue honest: the two existing games remain available; each new game is marked “Soon” until its playable route exists. Add a launch action only when a real route is wired. Show player requirements before entering a game. Preserve current section order, route behavior, and existing translations.
+
+## Step 15: shared edge cases and UX checks for all ten games
+
+For every new game, explicitly handle:
+
+- Minimum and maximum practical participants for its rules; do not claim global capacity from a single local test.
+- Join or leave during every phase, reconnect, refresh, host refresh, and process restart.
+- Duplicate action retries, stale phase events, invalid ownership, late submissions, no response, and deadline expiry.
+- Ties, no votes, empty rounds, and the condition for ending without waiting on a missing player.
+- Private information: roles, answers, drawings, prompts, and submissions must be revealed at the stated phase, not earlier.
+- Text length, safe rendering, host hide/replace behavior, and a clear fallback when player-generated content is unsupported.
+- 320 CSS px, keyboard focus, assistive technology labels, reduced motion, readable TV text, language changes, and light/dark themes supported by the existing app.
+
+Do not duplicate lobby logic across games. Keep one shared host/phone room shell and make only the inner phase content game-specific. Do not let one failed mode interrupt another running room.
+
+## Step 16: deliver in milestones
+
+Implement sequentially in this order: Wrong Dub, Guess the Crowd, Confident Quiz, Duel of Absurd Answers, Fake Definition, Telephone Without Words, Show, Don’t Tell, The Impostor, Save the Tower, Monster Runway. After each game, finish its host/phone flow, result state, requirements, and edge cases before moving on. Keep the other not-yet-playable games visibly marked as “Soon”.
+
+If a mode is blocked by a shared architectural limitation, document the blocker and proceed with independent modes. Do not replace a game with a mock screen or claim it is complete without a playable round.
+
 ## Completion report
 
 Finish with:
 
 - The files and behaviors changed.
-- The full round flow now available.
-- Which edge cases were handled.
+- Which of the ten new modes are fully playable and which remain.
+- The round flow and edge cases completed for each playable mode.
 - What you verified and on which browsers/devices.
-- Any unresolved codec, storage, synchronization, licensing, or capacity decisions.
+- Any unresolved media, storage, synchronization, content, or capacity decisions.
 - Confirmation that nothing was deployed.
