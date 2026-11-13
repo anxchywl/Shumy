@@ -1,0 +1,14 @@
+.crowd-screen .crowd-main { display:grid; align-content:center; gap:1rem; flex:1; width:min(100%, 70rem); margin:auto; }
+.crowd-screen .crowd-main h1 { font-size:clamp(2rem, 5vw, 4.5rem); line-height:1.1; }
+.crowd-screen .crowd-main ol { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:1rem; padding:0; list-style:none; }
+.crowd-screen .crowd-main li { position:relative; display:flex; justify-content:space-between; align-items:center; gap:1rem; min-width:0; min-height:5rem; overflow:hidden; padding:1rem 1.3rem; border:2px solid var(--text); border-radius:.8rem; background:var(--surface); font-size:clamp(1.2rem, 2.3vw, 2rem); }
+.crowd-screen .crowd-main li strong,.crowd-screen .crowd-main li span:last-child { position:relative; z-index:1; }
+.crowd-screen .crowd-bar { position:absolute; inset:0 auto 0 0; background:var(--accent-soft); }
+.crowd-screen #crowdStatus { font-size:clamp(1.2rem, 2vw, 1.8rem); font-weight:700; }
+#crowd .choices button { text-align:left; }
+#crowd #crowdClock { color:var(--muted); font-weight:700; }
+#crowd #crowdFeedback { color:var(--danger); font-weight:700; }
+@media (max-width:44rem) {
+  .crowd-screen .crowd-main ol { grid-template-columns:minmax(0, 1fr); }
+  .crowd-screen .crowd-main li { min-height:3.5rem; font-size:1.1rem; }
+}

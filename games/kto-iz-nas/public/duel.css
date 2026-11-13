@@ -1,0 +1,19 @@
+.duel-screen .duel-main { display:grid; align-content:center; gap:1rem; flex:1; width:min(100%, 72rem); margin:auto; }
+.duel-screen .duel-main h1 { font-size:clamp(2rem, 5vw, 4.5rem); line-height:1.1; }
+.duel-screen #duelStatus { font-size:clamp(1.2rem, 2vw, 1.8rem); font-weight:700; }
+.duel-cards { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; }
+.duel-card { display:grid; align-content:start; gap:.6rem; min-width:0; padding:1.3rem; border:2px solid var(--text); border-radius:1rem; background:var(--surface); }
+.duel-card strong { font-size:1.1em; }
+.duel-card p { margin:0; font-size:clamp(1.1rem, 2vw, 1.7rem); font-weight:750; overflow-wrap:anywhere; }
+.duel-card small { color:var(--muted); font-weight:700; }
+.duel-card button { width:auto; min-height:2.8rem; background:var(--surface); color:var(--text); }
+#duelForm { display:grid; gap:.7rem; margin-top:1.4rem; }
+#duelForm input { min-width:0; }
+#duel .choices button[aria-pressed="true"] { border-color:var(--accent); box-shadow:inset 0 0 0 2px var(--accent); }
+#duel #duelClock { color:var(--muted); font-weight:700; }
+#duel #duelFeedback { color:var(--danger); font-weight:700; }
+#duelResult { display:grid; gap:.8rem; }
+@media (max-width:44rem) {
+  .duel-cards { grid-template-columns:minmax(0,1fr); }
+  .duel-card { padding:1rem; }
+}
