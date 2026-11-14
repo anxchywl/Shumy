@@ -1,0 +1,6 @@
+.telephone-canvas{display:block;width:min(100%,600px);height:auto;aspect-ratio:3/2;background:#fffaf1;border:2px solid #30342f;border-radius:8px;touch-action:none}
+.telephone-canvas[hidden],#telephoneTextRow[hidden]{display:none}
+#telephonePrevious .telephone-canvas,#telephoneReveal .telephone-canvas{width:100%}
+#telephoneText{width:100%}
+#telephoneCards{display:grid;gap:1rem;overflow:auto;max-height:65vh}
+#telephoneReveal{display:grid;gap:1rem}
