@@ -1,0 +1,13 @@
+.dictation-main{width:min(100%,68rem);margin:auto;overflow:auto}
+.dictation-copy{line-height:1.5;max-width:46rem}
+.dictation-gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));gap:1rem;margin:1rem 0}
+.dictation-card{min-width:0;padding:1rem;border:2px solid var(--text);border-radius:1rem;background:var(--surface)}
+.dictation-card canvas{display:block;width:100%;aspect-ratio:8/5;background:#fffdf4;border:1px solid var(--edge);border-radius:.5rem}
+.dictation-card p{overflow-wrap:anywhere}
+.dictation-board{display:block;width:100%;max-width:600px;aspect-ratio:8/5;background:#fffdf4;border:2px solid var(--text);border-radius:.5rem;touch-action:none}
+.dictation-board[hidden]{display:none}
+.dictation-controls{display:flex;flex-wrap:wrap;gap:.7rem;margin:.8rem 0}
+.dictation-controls button{min-height:44px}
+.dictation-controls input{min-width:0;max-width:20rem}
+#dictationWord{font-size:clamp(1.5rem,6vw,2.5rem);font-weight:800}
+@media(max-width:340px){.dictation-controls>*{width:100%}}
