@@ -17,6 +17,7 @@
     const mode = root.dataset.gameMode;
     if (mode === "draw") return theme === "dark" ? "#172329" : "#eef4f3";
     if (mode === "vote") return theme === "dark" ? "#241b18" : "#fff4ec";
+    if (mode === "dub") return theme === "dark" ? "#1f1b26" : "#f4f1f7";
     return colors[theme];
   }
 

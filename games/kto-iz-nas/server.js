@@ -6,11 +6,39 @@ const { randomBytes, randomUUID, timingSafeEqual } = require('crypto');
 const { renderQrSvg } = require('./qr');
 const QUESTIONS = require('./questions');
 const { CARDS, normalize, maskWord, validSegment } = require('./drawing');
+const { loadScenes, createDub, TAKE_MAX_BYTES } = require('./dub');
+const { createCrowd } = require('./crowd');
+const { createQuiz } = require('./quiz');
+const { createDuel } = require('./duel');
+const { createFakeDefinition } = require('./fake-definition');
+const { createTelephone } = require('./telephone');
+const { createShow } = require('./show');
+const { createImpostor } = require('./impostor');
+const { createTower } = require('./tower');
+const { createMonster } = require('./monster');
+const { createDictation } = require('./dictation');
+const { generateAvatar, AVATARS } = require('./avatar');
 
 const PORT = Number(process.env.PORT) || 5181;
 const VOTE_SECONDS = Number(process.env.VOTE_SECONDS) || 20;
 const DRAW_SECONDS = Number(process.env.DRAW_SECONDS) || 65;
-const COLORS = ['#f39885', '#94bafa', '#e8ca76', '#9dca8e', '#c8aae9', '#8ad1cb', '#f4ae76', '#ecabd0', '#adbccf', '#c4cb79'];
+const seconds = (name, fallback) => (Number(process.env[name]) || fallback) * 1000;
+// starting playtest values, not a tuned balance
+const DUB_CONFIG = {
+  introMs: seconds('DUB_INTRO_SECONDS', 8),
+  slotMs: seconds('DUB_SLOT_SECONDS', 30),
+  voteMs: seconds('DUB_VOTE_SECONDS', 20),
+  handoffMs: seconds('DUB_HANDOFF_SECONDS', 4),
+  extendMs: 10000,
+  reopenMs: 15000,
+  retakeMinMs: 5000,
+  playLeadMs: 1500,
+  roomBytes: 2 * 1024 * 1024,
+};
+const DUB_SCENES = loadScenes(require('./dub-scenes'), path.join(__dirname, 'public'));
+for (const scene of DUB_SCENES) {
+  if (scene.problems.length) console.error(`\n  Сцена «${scene.id}» не пройдёт в игру:\n   - ${scene.problems.join('\n   - ')}`);
+}
 
 function lanIp() {
   if (process.env.HOST_IP) return process.env.HOST_IP;
@@ -25,7 +53,7 @@ if (publicUrl && (publicUrl.protocol !== 'https:' || !publicUrl.pathname.endsWit
 }
 const JOIN_URL = publicUrl?.href ?? `http://${lanIp()}:${PORT}/`;
 const COOKIE_PATH = publicUrl?.pathname ?? '/';
-const hostActions = new Set(['next', 'lobby', 'settings', 'kick']);
+const hostActions = new Set(['next', 'lobby', 'settings', 'kick', 'dubAdvance', 'dubExtend', 'dubFinish', 'dubReopen', 'dubCancel', 'dubPlay', 'dubHide', 'dubNext', 'crowdAdvance', 'crowdNext', 'quizAdvance', 'quizNext', 'duelAdvance', 'duelHide', 'duelNext', 'fakeAdvance', 'fakeHide', 'fakeNext', 'telephoneAdvance', 'telephoneNext', 'showAdvance', 'showNext', 'impostorAdvance', 'impostorHide', 'impostorNext', 'towerAdvance', 'towerNext', 'monsterAdvance', 'monsterHide', 'monsterPage', 'monsterNext', 'dictationCancel', 'dictationNext', 'dictationRetry']);
 
 function matches(input, expected) {
   const value = Buffer.from(input);
@@ -48,12 +76,26 @@ function createRoom(code) {
   const players = new Map();
   const sessions = new Map();
   let game = freshGame();
+  let sequence = 0;
+  const dub = createDub({ players, scenes: DUB_SCENES, config: DUB_CONFIG, changed: () => broadcast() });
+  const crowd = createCrowd({ players, changed: () => broadcast() });
+  const quiz = createQuiz({ players, changed: () => broadcast() });
+  const duel = createDuel({ players, changed: () => broadcast() });
+  const fake = createFakeDefinition({ players, changed: () => broadcast() });
+  const telephone = createTelephone({ players, changed: () => broadcast() });
+  const show = createShow({ players, changed: () => broadcast() });
+  const impostor = createImpostor({ players, changed: () => broadcast() });
+  const tower = createTower({ players, changed: () => broadcast() });
+  const monster = createMonster({ players, changed: () => broadcast() });
+  const dictation = createDictation({ players, changed: () => broadcast() });
   function freshGame() {
     return {
-      phase: 'lobby', // lobby | question | reveal | final
+      phase: 'lobby', // lobby | question | reveal | final | draw | draw-result | dub
       round: 0,
       totalRounds: 10,
-      mode: 'vote',
+      otherRounds: null,
+      mode: null,
+      dubScene: null,
       anonymous: false,
       deck: shuffle([...QUESTIONS]),
       question: null,
@@ -76,10 +118,12 @@ function createRoom(code) {
 
   function publicState() {
     const list = [...players.values()].map(p => ({
-      id: p.id, name: p.name, color: p.color, score: p.score, online: p.online,
+      id: p.id, name: p.name, color: p.color, avatar: p.avatar, score: p.score, online: p.online,
       voted: game.votes.has(p.id), timesPicked: p.timesPicked,
     }));
     return {
+      // clients drop a snapshot that arrives after a newer one
+      seq: ++sequence,
       mode: game.mode,
       phase: game.phase,
       round: game.round,
@@ -93,6 +137,22 @@ function createRoom(code) {
       joinUrl: `${JOIN_URL}?room=${code}`,
       drawRoute: game.route,
       drawing: publicDrawing(),
+      dub: dub.publicState(),
+      crowd: crowd.publicState(),
+      quiz: quiz.publicState(),
+      duel: duel.publicState(),
+      fake: fake.publicState(),
+      telephone: telephone.publicState(),
+      showGame: show.publicState(),
+      impostor: impostor.publicState(),
+      tower: tower.publicState(),
+      monster: monster.publicState(),
+      dictation: dictation.publicState(),
+      dubScene: game.dubScene,
+      dubScenes: game.mode === 'dub' && game.phase === 'lobby' ? DUB_SCENES.map(scene => ({
+        id: scene.id, title: scene.title, tone: scene.tone, durationMs: scene.asset?.durationMs ?? 0,
+        slots: scene.slots?.length ?? 0, problem: scene.problems[0] ?? null,
+      })) : undefined,
     };
   }
 
@@ -122,7 +182,25 @@ function createRoom(code) {
     const selfId = sessions.get(client.pid) ?? null;
     const turn = game.drawing;
     const secretWord = game.phase === 'draw' && selfId === turn.artist ? turn.card.word : undefined;
-    writeEvent(client, `data: ${JSON.stringify({ ...state, selfId, secretWord })}\n\n`);
+    // with one identity on two devices the latest connection is the active one
+    const selfActive = !client.pid || [...clients].findLast(other => other.pid === client.pid) === client;
+    const dubMine = dub.privateState(selfId) ?? undefined;
+    const dubHost = client.host ? dub.hostState() ?? undefined : undefined;
+    const crowdMine = crowd.privateState(selfId) ?? undefined;
+    const quizMine = quiz.privateState(selfId) ?? undefined;
+    const duelMine = duel.privateState(selfId) ?? undefined;
+    const duelHost = client.host ? duel.hostState() ?? undefined : undefined;
+    const fakeMine = fake.privateState(selfId) ?? undefined;
+    const fakeHost = client.host ? fake.hostState() ?? undefined : undefined;
+    const telephoneMine = telephone.privateState(selfId) ?? undefined;
+    const showMine = show.privateState(selfId) ?? undefined;
+    const impostorMine = impostor.privateState(selfId) ?? undefined;
+    const impostorHost = client.host ? impostor.hostState() ?? undefined : undefined;
+    const towerMine = tower.privateState(selfId) ?? undefined;
+    const monsterMine = monster.privateState(selfId) ?? undefined;
+    const monsterHost = client.host ? monster.hostState() ?? undefined : undefined;
+    const dictationMine = dictation.privateState(selfId) ?? undefined;
+    writeEvent(client, `data: ${JSON.stringify({ ...state, selfId, selfActive, secretWord, dubMine, dubHost, crowdMine, quizMine, duelMine, duelHost, fakeMine, fakeHost, telephoneMine, showMine, impostorMine, impostorHost, towerMine, monsterMine, monsterHost, dictationMine })}\n\n`);
   }
   function writeEvent(client, event) {
     if (client.res.writableLength > 512 * 1024) client.res.destroy();
@@ -141,6 +219,8 @@ function createRoom(code) {
       broadcast();
       maybeAllVoted();
       maybeAllGuessed();
+      dub.presenceChanged();
+      dictation.presenceChanged();
     }
   }
 
@@ -191,8 +271,88 @@ function createRoom(code) {
 
   function next() {
     if (game.phase === 'lobby') {
+      if (!game.mode) return { error: 'Сначала выбери игру' };
       const online = [...players.values()].filter(p => p.online);
-      if ((game.mode === 'draw' ? online.length : players.size) < 2) return;
+      if ((game.mode === 'vote' ? players.size : online.length) < 2) return;
+      if (game.mode === 'dub') {
+        const started = dub.start(game.dubScene);
+        if (started.error) return started;
+        game.phase = 'dub';
+        broadcast();
+        return;
+      }
+      if (game.mode === 'crowd') {
+        for (const p of players.values()) p.score = 0;
+        const started = crowd.start();
+        if (started.error) return started;
+        game.phase = 'crowd';
+        broadcast();
+        return;
+      }
+      if (game.mode === 'quiz') {
+        for (const p of players.values()) p.score = 0;
+        const started = quiz.start();
+        if (started.error) return started;
+        game.phase = 'quiz';
+        broadcast();
+        return;
+      }
+      if (game.mode === 'duel') {
+        const started = duel.start();
+        if (started.error) return started;
+        game.phase = 'duel';
+        broadcast();
+        return;
+      }
+      if (game.mode === 'fake') {
+        const started = fake.start();
+        if (started.error) return started;
+        game.phase = 'fake';
+        broadcast();
+        return;
+      }
+      if (game.mode === 'telephone') {
+        const started = telephone.start();
+        if (started.error) return started;
+        game.phase = 'telephone';
+        broadcast();
+        return;
+      }
+      if (game.mode === 'show') {
+        const started = show.start();
+        if (started.error) return started;
+        game.phase = 'show';
+        broadcast();
+        return;
+      }
+      if (game.mode === 'impostor') {
+        const started = impostor.start();
+        if (started.error) return started;
+        game.phase = 'impostor';
+        broadcast();
+        return;
+      }
+      if (game.mode === 'tower') {
+        const started = tower.start();
+        if (started.error) return started;
+        game.phase = 'tower';
+        broadcast();
+        return;
+      }
+      if (game.mode === 'monster') {
+        const started = monster.start();
+        if (started.error) return started;
+        game.phase = 'monster';
+        broadcast();
+        return;
+      }
+      if (game.mode === 'dictation') {
+        const started = dictation.start(game.totalRounds);
+        if (started.error) return started;
+        game.phase = 'dictation';
+        broadcast();
+        return;
+      }
       for (const p of players.values()) { p.score = 0; p.timesPicked = 0; }
       if (game.mode === 'draw') {
         game.route = shuffle(online.map(({ id, name, color }) => ({ id, name, color })));
@@ -213,8 +373,21 @@ function createRoom(code) {
   function toLobby() {
     clearTimeout(game.timer);
     clearTimeout(game.drawing?.hintTimer);
-    const { totalRounds, voteRounds, anonymous, mode } = game;
+    dub.stop();
+    crowd.stop();
+    quiz.stop();
+    duel.stop();
+    fake.stop();
+    telephone.stop();
+    show.stop();
+    impostor.stop();
+    tower.stop();
+    monster.stop();
+    dictation.stop();
+    const { totalRounds, voteRounds, anonymous, mode, dubScene, otherRounds } = game;
     game = freshGame();
+    game.dubScene = dubScene;
+    game.otherRounds = otherRounds;
     game.totalRounds = voteRounds ?? totalRounds;
     game.anonymous = anonymous;
     game.mode = mode;
@@ -317,9 +490,10 @@ function createRoom(code) {
       let p = players.get(sessions.get(pid));
       if (!p) {
         if (players.size >= 50) return { error: 'Комната заполнена' };
-        const used = new Set([...players.values()].map(x => x.color));
-        const color = COLORS.find(c => !used.has(c)) || COLORS[players.size % COLORS.length];
-        p = { id: randomUUID(), name: '', color, score: 0, online: [...clients].some(c => c.pid === pid), timesPicked: 0 };
+        // the avatar body colour becomes the player colour used by dots and bars
+        const avatar = generateAvatar({ taken: [...players.values()].map(x => x.avatar) });
+        const color = AVATARS.palette[avatar.color];
+        p = { id: randomUUID(), name: '', color, avatar, score: 0, online: [...clients].some(c => c.pid === pid), timesPicked: 0 };
         players.set(p.id, p);
         sessions.set(pid, p.id);
       }
@@ -332,6 +506,8 @@ function createRoom(code) {
       sessions.delete(pid);
       players.delete(id);
       game.votes.delete(id);
+      dub.playerLeft(id);
+      dictation.presenceChanged();
       broadcast();
       maybeAllVoted();
       if (game.phase === 'draw' && id === game.drawing.artist) revealDrawing();
@@ -399,15 +575,22 @@ function createRoom(code) {
     },
     // host (TV) actions
     next({ phase, round }) {
-      if (phase === undefined || (phase === game.phase && round === game.round)) next();
+      if (phase === undefined || (phase === game.phase && round === game.round)) return next() ?? { ok: true };
       return { ok: true };
     },
     lobby() { toLobby(); return { ok: true }; },
-    settings({ totalRounds, anonymous, mode }) {
+    settings({ totalRounds, anonymous, mode, dubScene }) {
       if (game.phase !== 'lobby') return { error: 'Только в лобби' };
       if (totalRounds !== undefined && (!Number.isInteger(totalRounds) || totalRounds < 1 || totalRounds > 50)) return { error: 'Неверное число раундов' };
-      if (mode !== undefined && mode !== 'vote' && mode !== 'draw') return { error: 'Нет такой игры' };
-      if (mode !== undefined) game.mode = mode;
+      if (mode !== undefined && !['vote', 'draw', 'dub', 'crowd', 'quiz', 'duel', 'fake', 'telephone', 'show', 'impostor', 'tower', 'monster', 'dictation'].includes(mode)) return { error: 'Нет такой игры' };
+      if (totalRounds !== undefined && (mode ?? game.mode) === 'dictation' && ![1, 3, 5].includes(totalRounds)) return { error: 'Неверное число раундов' };
+      if (dubScene !== undefined && dubScene !== null && !DUB_SCENES.some(scene => scene.id === dubScene)) return { error: 'Нет такой сцены' };
+      if (mode !== undefined && mode !== game.mode) {
+        if (mode === 'dictation') { game.otherRounds = game.totalRounds; game.totalRounds = 3; }
+        else if (game.mode === 'dictation') game.totalRounds = game.otherRounds ?? 10;
+        game.mode = mode;
+      }
+      if (dubScene !== undefined) game.dubScene = dubScene;
       if (totalRounds !== undefined) game.totalRounds = totalRounds;
       if (typeof anonymous === 'boolean') game.anonymous = anonymous;
       broadcast();
@@ -419,11 +602,49 @@ function createRoom(code) {
     },
   };
 
-  const room = { code, hostKey: randomBytes(24).toString('hex'), createdAt: Date.now(), lastActive: Date.now(), clients, actions, connect, setOnline, destroy };
+  for (const [name, action] of Object.entries(dub.playerActions)) actions[name] = body => action(sessions.get(body.pid), body);
+  for (const [name, action] of Object.entries(crowd.playerActions)) actions[name] = body => action(sessions.get(body.pid), body);
+  for (const [name, action] of Object.entries(quiz.playerActions)) actions[name] = body => action(sessions.get(body.pid), body);
+  for (const [name, action] of Object.entries(duel.playerActions)) actions[name] = body => action(sessions.get(body.pid), body);
+  for (const [name, action] of Object.entries(fake.playerActions)) actions[name] = body => action(sessions.get(body.pid), body);
+  for (const [name, action] of Object.entries(telephone.playerActions)) actions[name] = body => action(sessions.get(body.pid), body);
+  for (const [name, action] of Object.entries(show.playerActions)) actions[name] = body => action(sessions.get(body.pid), body);
+  for (const [name, action] of Object.entries(impostor.playerActions)) actions[name] = body => action(sessions.get(body.pid), body);
+  for (const [name, action] of Object.entries(tower.playerActions)) actions[name] = body => action(sessions.get(body.pid), body);
+  for (const [name, action] of Object.entries(monster.playerActions)) actions[name] = body => action(sessions.get(body.pid), body);
+  for (const [name, action] of Object.entries(dictation.playerActions)) actions[name] = body => action(sessions.get(body.pid), body);
+  Object.assign(actions, dub.hostActions);
+  Object.assign(actions, crowd.hostActions);
+  Object.assign(actions, quiz.hostActions);
+  Object.assign(actions, duel.hostActions);
+  Object.assign(actions, fake.hostActions);
+  Object.assign(actions, telephone.hostActions);
+  Object.assign(actions, show.hostActions);
+  Object.assign(actions, impostor.hostActions);
+  Object.assign(actions, tower.hostActions);
+  Object.assign(actions, monster.hostActions);
+  Object.assign(actions, dictation.hostActions);
+  actions.dubCancel = body => {
+    const out = dub.hostActions.dubCancel(body);
+    if (out.ok) toLobby();
+    return out;
+  };
+
+  function submitTake(pid, meta, data) {
+    const out = dub.submitTake(sessions.get(pid), meta, data);
+    room.lastActive = Date.now();
+    return out;
+  }
+
+  function take(takeId, req, pid) {
+    return dub.takeFor(takeId, { host: isHost(req, room), playerId: sessions.get(pid) });
+  }
+
+  const room = { code, hostKey: randomBytes(24).toString('hex'), createdAt: Date.now(), lastActive: Date.now(), clients, actions, connect, setOnline, destroy, submitTake, take };
 
   function connect(req, res, pid) {
     res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', Connection: 'keep-alive' });
-    const c = { res, pid };
+    const c = { res, pid, host: isHost(req, room) };
     clients.add(c);
     room.lastActive = Date.now();
     res.write('retry: 1500\n');
@@ -438,6 +659,17 @@ function createRoom(code) {
   }
 
   function destroy() {
+    dub.stop();
+    crowd.stop();
+    quiz.stop();
+    duel.stop();
+    fake.stop();
+    telephone.stop();
+    show.stop();
+    impostor.stop();
+    tower.stop();
+    monster.stop();
+    dictation.stop();
     clearTimeout(game.timer);
     clearTimeout(game.drawing?.hintTimer);
     for (const c of clients) c.res.end();
@@ -530,6 +762,30 @@ const files = new Map([
   ['/objects.svg', ['objects.svg', 'image/svg+xml']],
   ['/drawing.css', ['drawing.css', 'text/css']],
   ['/drawing-client.js', ['drawing-client.js', 'text/javascript']],
+  ['/dub.css', ['dub.css', 'text/css']],
+  ['/dub-client.js', ['dub-client.js', 'text/javascript']],
+  ['/dub-host.js', ['dub-host.js', 'text/javascript']],
+  ['/dub-phone.js', ['dub-phone.js', 'text/javascript']],
+  ['/crowd.css', ['crowd.css', 'text/css']],
+  ['/crowd-ui.js', ['crowd-ui.js', 'text/javascript']],
+  ['/quiz.css', ['quiz.css', 'text/css']],
+  ['/quiz-ui.js', ['quiz-ui.js', 'text/javascript']],
+  ['/duel.css', ['duel.css', 'text/css']],
+  ['/duel-ui.js', ['duel-ui.js', 'text/javascript']],
+  ['/fake-ui.js', ['fake-ui.js', 'text/javascript']],
+  ['/telephone-ui.js', ['telephone-ui.js', 'text/javascript']],
+  ['/telephone.css', ['telephone.css', 'text/css']],
+  ['/show-ui.js', ['show-ui.js', 'text/javascript']],
+  ['/impostor-ui.js', ['impostor-ui.js', 'text/javascript']],
+  ['/tower-ui.js', ['tower-ui.js', 'text/javascript']],
+  ['/tower.css', ['tower.css', 'text/css']],
+  ['/monster-ui.js', ['monster-ui.js', 'text/javascript']],
+  ['/avatar-types.js', ['avatar-types.js', 'text/javascript']],
+  ['/avatar-art.js', ['avatar-art.js', 'text/javascript']],
+  ['/monster.css', ['monster.css', 'text/css']],
+  ['/dictation-ui.js', ['dictation-ui.js', 'text/javascript']],
+  ['/dictation.css', ['dictation.css', 'text/css']],
+  ...DUB_SCENES.filter(scene => !scene.problems.length).map(scene => [`/${scene.asset.file}`, [scene.asset.file, scene.asset.type]]),
 ]);
 
 const server = http.createServer(async (req, res) => {
@@ -545,6 +801,47 @@ const server = http.createServer(async (req, res) => {
       return res.end('event: missing\ndata: {}\n\n');
     }
     return room.connect(req, res, url.searchParams.get('pid'));
+  }
+
+  // a voice take arrives as raw wav bytes, its identity travels in a header so it never lands in a url
+  if (url.pathname === '/api/dubTake' && req.method === 'POST') {
+    if (req.headers['content-type']?.split(';')[0] !== 'audio/wav') return send(res, 415, { error: 'Ожидается запись в формате WAV' });
+    const room = roomFrom(url.searchParams.get('room'));
+    if (!room) {
+      if (tooManyMisses(ip)) return limitReached(res, 'Слишком много попыток. Подожди минуту');
+      record(`miss:${ip}`);
+      return send(res, 404, { error: 'Нет такой комнаты', missing: true });
+    }
+    const pid = String(req.headers['x-shumy-pid'] || '');
+    const chunks = [];
+    let size = 0;
+    let tooLarge = false;
+    req.on('data', chunk => {
+      size += chunk.length;
+      if (size > TAKE_MAX_BYTES) tooLarge = true;
+      else chunks.push(chunk);
+    });
+    req.on('end', () => {
+      if (tooLarge) return send(res, 413, { error: 'Запись слишком большая. Запиши ещё раз или отправь текст', retry: true });
+      const meta = {
+        slot: url.searchParams.get('slot'),
+        round: url.searchParams.get('round'),
+        v: Number(url.searchParams.get('v')),
+        actionId: url.searchParams.get('actionId'),
+      };
+      const out = room.submitTake(pid, meta, Buffer.concat(chunks));
+      send(res, out.status ?? (out.error ? 400 : 200), out);
+      room.setOnline(pid);
+    });
+    return;
+  }
+
+  if (url.pathname.startsWith('/media/dub/') && req.method === 'GET') {
+    const room = roomFrom(url.searchParams.get('room'));
+    const data = room?.take(url.pathname.slice(11), req, String(req.headers['x-shumy-pid'] || ''));
+    if (!data) return send(res, 404, 'not found', 'text/plain');
+    res.writeHead(200, { 'Content-Type': 'audio/wav', 'Content-Length': data.length, 'Cache-Control': 'private, no-store' });
+    return res.end(data);
   }
 
   if (url.pathname.startsWith('/api/') && req.method === 'POST') {
@@ -566,7 +863,7 @@ const server = http.createServer(async (req, res) => {
       if (hostActions.has(action) && !isHost(req, room)) return send(res, 401, { error: 'Это действие доступно только ведущему комнаты' });
       const out = room.actions[action](body);
       room.lastActive = Date.now();
-      send(res, out.error ? 400 : 200, out);
+      send(res, out.status ?? (out.error ? 400 : 200), out);
       if (body.pid) room.setOnline(body.pid);
     });
     return;
@@ -604,7 +901,12 @@ const server = http.createServer(async (req, res) => {
   }
 
   const file = files.get(url.pathname);
-  if (file) return send(res, 200, fs.readFileSync(path.join(__dirname, 'public', file[0])), `${file[1]}; charset=utf-8`);
+  if (file) {
+    const type = file[1].startsWith('text/') || file[1].includes('javascript') || file[1].includes('svg+xml')
+      ? `${file[1]}; charset=utf-8`
+      : file[1];
+    return send(res, 200, fs.readFileSync(path.join(__dirname, 'public', file[0])), type);
+  }
   send(res, 404, 'not found', 'text/plain');
 });
 

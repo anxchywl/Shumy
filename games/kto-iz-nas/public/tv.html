@@ -1,13 +1,21 @@
 <!doctype html>
-<html lang="ru" data-game-mode="vote">
+<html lang="ru" data-game-mode="">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#f9f8f4">
-<title>Кто из нас? Экран ведущего</title>
+<title>Шуми · Экран ведущего</title>
 <link rel="icon" href="data:,">
 <script>if (new URLSearchParams(location.search).get('shumyEmbed') === 'host') document.documentElement.dataset.embed = 'host';</script>
 <script src="./theme.js?v=15"></script>
+<link rel="stylesheet" href="./dub.css">
+<link rel="stylesheet" href="./crowd.css">
+<link rel="stylesheet" href="./quiz.css">
+<link rel="stylesheet" href="./duel.css">
+<link rel="stylesheet" href="./telephone.css">
+<link rel="stylesheet" href="./dictation.css">
+<link rel="stylesheet" href="./tower.css">
+<link rel="stylesheet" href="./monster.css">
 <link rel="stylesheet" href="./theme.css?v=10">
 <link rel="stylesheet" href="./drawing.css">
 <style>
@@ -41,7 +49,7 @@
 
   .lobby { flex:1; display:grid; grid-template-columns:minmax(10rem, 13.5rem) minmax(16rem, 23rem) minmax(22rem, 34rem); justify-content:center; align-content:center; align-items:center; gap:clamp(1rem, 2.5vw, 2.5rem); margin-top:2vh; min-height:0; }
   .lobby-invite { display:grid; justify-items:stretch; align-content:center; align-self:stretch; gap:1rem; min-width:0; padding-top:4rem; }
-  .invite-panel { display:grid; justify-items:center; align-content:center; gap:1rem; min-width:0; padding:1.25rem .85rem; border:2px solid var(--text); border-radius:1.5rem; background:var(--surface); box-shadow:6px 6px 0 var(--text); text-align:center; transition:background-color var(--theme-duration) var(--theme-ease),border-color var(--theme-duration) var(--theme-ease),color var(--theme-duration) var(--theme-ease),box-shadow var(--theme-duration) var(--theme-ease); }
+  .invite-panel { display:grid; justify-items:center; align-content:center; gap:1rem; min-width:0; padding:1.25rem .85rem; border:2px solid var(--text); border-radius:1.5rem; background:var(--surface); text-align:center; transition:background-color var(--theme-duration) var(--theme-ease),border-color var(--theme-duration) var(--theme-ease),color var(--theme-duration) var(--theme-ease); }
   .qr-frame { position:relative; width:clamp(8rem, 12vw, 11rem); max-width:100%; aspect-ratio:1; padding:.3rem; border:2px solid #30342f; border-radius:.8rem; background:#fff; }
   .qr-frame img { display:block; width:100%; height:100%; }
   .qr-face { position:absolute; top:50%; left:50%; display:grid; place-items:center; width:22%; aspect-ratio:1; border-radius:50%; background:#fff; transform:translate(-50%, -50%); pointer-events:none; }
@@ -60,21 +68,16 @@
   .start-hint { margin-top:-.5rem; color:var(--muted); font-size:.82rem; font-weight:700; line-height:1.3; text-align:center; transition:color var(--theme-duration) var(--theme-ease); }
   .lobby-room { position:relative; display:flex; flex-direction:column; align-items:stretch; justify-content:flex-start; gap:1rem; min-width:0; height:min(75vh, 35rem); overflow:auto; padding:1.35rem; border:2px dashed color-mix(in srgb, var(--text) 35%, transparent); border-radius:1.5rem; background:color-mix(in srgb, #7fb59f 24%, var(--surface)); text-align:left; transition:background-color var(--theme-duration) var(--theme-ease),border-color var(--theme-duration) var(--theme-ease),color var(--theme-duration) var(--theme-ease); }
   .count { width:100%; padding:0 0 .75rem; border-bottom:1px solid color-mix(in srgb, var(--text) 18%, transparent); font-size:clamp(1.15rem, 1.6vw, 1.55rem); font-weight:850; line-height:1.15; letter-spacing:-.02em; }
-  .players { display:flex; flex-direction:column; justify-content:flex-start; gap:.55rem; align-content:stretch; width:100%; max-height:100%; overflow:auto; padding:0 .2rem .5rem 0; }
+  .players { display:flex; flex:1; flex-direction:column; justify-content:flex-start; gap:.75rem; align-content:stretch; width:100%; min-height:0; overflow:auto; padding:0 .2rem .5rem 0; }
+  .player-list { display:flex; flex:none; flex-direction:column; gap:.55rem; width:100%; }
   .player-row { display:flex; align-items:center; gap:.75rem; min-width:0; min-height:3.5rem; padding:.45rem .75rem; border:1px solid var(--edge); border-radius:1rem; background:var(--surface); box-shadow:2px 2px 0 color-mix(in srgb, var(--text) 75%, transparent); font-size:clamp(.9rem, 1.1vw, 1rem); font-weight:750; transition:background-color var(--theme-duration) var(--theme-ease),border-color var(--theme-duration) var(--theme-ease),color var(--theme-duration) var(--theme-ease),opacity .2s ease; }
   .player-row.off { opacity:.55; box-shadow:none; }
   .player-avatar { display:grid; place-items:center; flex:none; width:2.5rem; height:2.5rem; overflow:hidden; border:2px solid var(--text); border-radius:50%; background:color-mix(in srgb, var(--player) 45%, var(--surface)); }
   .player-avatar svg { width:78%; height:78%; }
+  .player-avatar svg[viewBox="0 0 120 120"] { width:96%; height:96%; margin-top:8%; }
   .player-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .player-status { margin-left:auto; flex:none; color:var(--muted); font-size:.75rem; font-weight:700; }
-  .waiting-art { position:absolute; z-index:0; bottom:.65rem; left:50%; width:min(10rem, 60%); height:auto; overflow:visible; transform:translateX(-50%); transition:opacity var(--theme-duration) var(--theme-ease); pointer-events:none; }
-  .lobby-room.is-waiting .count, .lobby-room.is-waiting .players { position:relative; z-index:1; }
-  .lobby-room:not(.is-waiting) .waiting-art { display:none; }
-  .seg { display:flex; flex-wrap:wrap; gap:.4rem; }
-  .seg button { min-height:2.6rem; padding:.5rem .7rem; border:2px solid var(--text); border-radius:.6rem; background:var(--surface); color:var(--text); font-size:.9rem; transition:background-color var(--theme-duration) var(--theme-ease),border-color var(--theme-duration) var(--theme-ease),color var(--theme-duration) var(--theme-ease); }
-  .seg button[aria-pressed="true"] { background:#3d6c5b; color:#fff; }
-  .toggle { display:flex; align-items:center; gap:.6rem; margin-top:1rem; font-size:1rem; font-weight:700; cursor:pointer; }
-  .toggle input { width:1.2rem; height:1.2rem; accent-color:#3d6c5b; }
+  .waiting-art { display:block; flex:none; align-self:center; width:min(10rem, 60%); height:auto; overflow:visible; transition:opacity var(--theme-duration) var(--theme-ease); pointer-events:none; }
 
   /* question */
   .qwrap { flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; gap:3vh; }
@@ -100,14 +103,30 @@
   .gains .pill { font-size:2.2vh; padding:.8vh 1.6vh; }
 
   /* final */
-  .podium { display:flex; justify-content:center; align-items:flex-end; gap:2vw; margin-top:3vh; }
-  .step { width:20vw; text-align:center; }
-  .step .block { border-radius:.8vh .8vh 0 0; display:grid; place-items:center; font-size:8vh; font-weight:750;
-    background:var(--surface); border:1px solid var(--edge); border-top:4px solid var(--player); color:var(--player); }
-  .step .n { font-size:4vh; font-weight:900; margin-bottom:.5vh; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .step .s { font-size:2.8vh; color:var(--muted); font-weight:700; margin-bottom:1.2vh; }
-  .rest { display:flex; gap:1.5vh; flex-wrap:wrap; justify-content:center; margin-top:3vh; }
-  .title { text-align:center; font-size:3vh; font-weight:800; margin-top:2.5vh; }
+  #s-final { align-items:center; }
+  #s-final > .top, #s-final > .bar { width:100%; }
+  .final-top h1 { font-size:clamp(2.4rem, 6vh, 4.5rem); letter-spacing:-.06em; }
+  .final-top .hint { padding:.65rem .9rem; border:1px solid var(--edge); border-radius:999px; background:var(--surface); }
+  .podium { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); align-items:end; gap:clamp(.65rem, 2vw, 1.5rem); width:min(100%, 64rem); flex:1; min-height:0; margin:clamp(1rem, 3vh, 2rem) auto 0; padding:0 clamp(.25rem, 2vw, 1.5rem); border-bottom:1px solid var(--edge); }
+  .podium[data-count="1"] { grid-template-columns:minmax(0, 24rem); justify-content:center; }
+  .step { --podium-color:var(--accent); --podium-soft:var(--accent-soft); display:flex; flex-direction:column; align-items:center; justify-content:flex-end; min-width:0; text-align:center; }
+  .step.place-1 { --podium-color:#3d6c5b; --podium-soft:#dcebe4; }
+  .step.place-2 { --podium-color:#b1802e; --podium-soft:#f7e9c9; }
+  .step.place-3 { --podium-color:#bd6c56; --podium-soft:#f5dfd7; }
+  .step-player { display:flex; flex-direction:column; align-items:center; width:100%; margin-bottom:1rem; }
+  .podium-avatar { display:grid; place-items:center; width:clamp(2.75rem, 7vh, 4.5rem); aspect-ratio:1; margin-bottom:.65rem; border:1px solid color-mix(in srgb, var(--podium-color) 35%, transparent); border-radius:50%; background:var(--podium-soft); color:var(--text); }
+  .podium-avatar svg { width:62%; height:62%; }
+  .step .n { max-width:100%; overflow:hidden; font-size:clamp(1rem, 2.8vh, 2rem); font-weight:850; text-overflow:ellipsis; white-space:nowrap; }
+  .step .s { margin-top:.15rem; color:var(--muted); font-size:clamp(.8rem, 1.8vh, 1.15rem); font-weight:700; }
+  .step .block { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.2rem; width:100%; min-height:5.5rem; border:1px solid color-mix(in srgb, var(--podium-color) 24%, var(--edge)); border-bottom:0; border-radius:1rem 1rem 0 0; background:linear-gradient(180deg, color-mix(in srgb, var(--podium-soft) 78%, var(--surface)), var(--surface)); color:var(--podium-color); }
+  .step.place-1 .block { min-height:9rem; box-shadow:inset 0 4px 0 var(--podium-color); }
+  .step.place-2 .block { min-height:7rem; box-shadow:inset 0 4px 0 var(--podium-color); }
+  .step.place-3 .block { min-height:5.5rem; box-shadow:inset 0 4px 0 var(--podium-color); }
+  .step .rank { font-size:clamp(2.2rem, 6vh, 4rem); font-weight:850; line-height:1; letter-spacing:-.06em; }
+  .step .rank-label { font-size:.78rem; font-weight:750; letter-spacing:.04em; text-transform:uppercase; }
+  .rest { display:flex; justify-content:center; flex-wrap:wrap; gap:.65rem; width:min(100%, 64rem); margin:1.2rem auto 0; }
+  .rest .pill { padding:.65rem 1rem; border-radius:999px; font-size:clamp(.8rem, 1.8vh, 1rem); }
+  .title { width:min(100%, 64rem); margin:1rem auto 0; padding:.8rem 1rem; border:1px solid var(--edge); border-radius:1rem; background:var(--surface); color:var(--text); text-align:center; font-size:clamp(.95rem, 2vh, 1.2rem); font-weight:750; }
   .hint { font-size:2vh; color:var(--muted); }
   .host-tools { display:flex; flex:1 1 24rem; min-width:0; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:1vh 2.5vh; }
   .host-tools .shortcuts { flex:0 1 auto; }
@@ -116,39 +135,26 @@
   #hostError { position:absolute; bottom:1vh; left:4vw; color:var(--danger); }
 
   #lobbyTitle { display:inline; padding:0 .15em; background:linear-gradient(transparent 60%, rgba(243,190,99,.75) 60% 90%, transparent 90%); }
-  .game-panel { position:relative; display:flex; flex-direction:column; min-width:0; height:min(75vh, 35rem); padding:1.2rem; border:2px solid var(--text); border-radius:1.5rem; background:var(--surface); box-shadow:6px 6px 0 var(--text); transition:background-color var(--theme-duration) var(--theme-ease),border-color var(--theme-duration) var(--theme-ease),color var(--theme-duration) var(--theme-ease),box-shadow var(--theme-duration) var(--theme-ease); }
+  .game-panel { position:relative; display:flex; flex-direction:column; min-width:0; height:min(75vh, 35rem); padding:1.2rem; border:2px solid var(--text); border-radius:1.5rem; background:var(--surface); transition:background-color var(--theme-duration) var(--theme-ease),border-color var(--theme-duration) var(--theme-ease),color var(--theme-duration) var(--theme-ease); }
   .game-panel-head { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:1rem; }
   .game-panel-title { font-size:clamp(1.4rem, 2vw, 1.8rem); font-weight:850; letter-spacing:-.02em; }
-  .panel-action { display:grid; place-items:center; flex:none; width:2.8rem; height:2.8rem; padding:.55rem; border:0; border-radius:.8rem; background:transparent; color:var(--text); transition:color var(--theme-duration) var(--theme-ease); }
-  .panel-action:hover { color:var(--accent); }
-  .panel-action svg { width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; transition:transform .38s cubic-bezier(.2,.75,.25,1); }
-  #gameSettings:hover svg, #gameSettings:focus-visible svg { transform:rotate(55deg); }
-  .panel-back:hover svg { transform:translateX(-3px); }
-  .game-panel-views { position:relative; flex:1; min-height:0; }
-  .game-grid, .game-settings { position:absolute; inset:0; transition:opacity .2s ease,transform .36s cubic-bezier(.2,.75,.25,1),visibility .2s; }
-  .game-panel[data-view="choose"] .game-grid, .game-panel[data-view="settings"] .game-settings { transition-delay:.2s; }
-  .game-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); grid-template-rows:repeat(2, minmax(0, 1fr)); gap:.7rem; }
+  .game-grid { flex:1; min-height:0; transition:opacity .24s ease; }
+  .game-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); grid-auto-rows:minmax(7rem, 1fr); gap:.7rem; overflow:auto; }
   .game-tile { position:relative; display:grid; grid-template-rows:minmax(0, 1fr) auto; justify-items:center; align-items:center; gap:.5rem; min-width:0; min-height:0; padding:.75rem .55rem; border:2px solid var(--text); border-radius:1rem; background:color-mix(in srgb, #f3be63 10%, var(--surface)); color:var(--text); text-align:center; box-shadow:3px 3px 0 var(--text); transition:background-color var(--theme-duration) var(--theme-ease),border-color var(--theme-duration) var(--theme-ease),color var(--theme-duration) var(--theme-ease),box-shadow var(--theme-duration) var(--theme-ease); }
-  .game-tile-art, .game-tile-description { grid-area:1 / 1; }
+  .game-tile-art { grid-area:1 / 1; }
   .game-tile-art { width:auto; height:5.1rem; max-width:100%; transition:opacity .25s ease,transform .25s ease; }
-  .game-tile-description { max-width:12rem; opacity:0; transform:translateY(6px); font-size:.9rem; font-weight:650; line-height:1.3; transition:opacity .25s ease,transform .25s ease; }
-  .game-tile-name { grid-column:1; font-size:clamp(.9rem, 1.15vw, 1.05rem); font-weight:850; line-height:1.15; }
+  .game-tile-description { position:absolute; inset:0; z-index:1; display:grid; place-items:center; padding:1rem; opacity:0; transform:translateY(6px); font-size:.9rem; font-weight:650; line-height:1.3; transition:opacity .25s ease,transform .25s ease; }
+  .game-tile-name { grid-column:1; font-size:clamp(.9rem, 1.15vw, 1.05rem); font-weight:850; line-height:1.15; transition:opacity .25s ease,transform .25s ease; }
   button.game-tile:not([aria-pressed="true"]):hover { border-color:var(--accent); }
   button.game-tile:active { filter:brightness(.97); }
   .game-tile[aria-pressed="true"] { border-color:#3d6c5b; background:color-mix(in srgb, #7fb59f 30%, var(--surface)); box-shadow:3px 3px 0 #3d6c5b; }
   .game-tile[aria-pressed="true"] .game-tile-art, button.game-tile:is(:hover, :focus-visible) .game-tile-art { opacity:0; transform:scale(.85) translateY(-5px); }
   .game-tile[aria-pressed="true"] .game-tile-description, button.game-tile:is(:hover, :focus-visible) .game-tile-description { opacity:1; transform:none; }
+  .game-tile[aria-pressed="true"] .game-tile-name, button.game-tile:is(:hover, :focus-visible) .game-tile-name { opacity:0; transform:translateY(-6px); }
   .game-tile.is-soon { border-style:dashed; box-shadow:none; background:transparent; }
   .game-tile.is-soon .game-tile-art { opacity:.45; }
   .game-tile.is-soon .game-tile-name { color:var(--muted); }
   .game-tile-ribbon { position:absolute; top:.4rem; right:.4rem; padding:.1rem .4rem; border-radius:999px; background:var(--text); color:var(--surface); font-size:.65rem; font-weight:800; transition:background-color var(--theme-duration) var(--theme-ease),color var(--theme-duration) var(--theme-ease); }
-  .game-settings { display:grid; align-content:center; justify-items:start; padding:.4rem .15rem; overflow:auto; }
-  #voteSettings { width:100%; }
-  .settings-game-name { margin-bottom:1.15rem; font-size:1.2rem; font-weight:800; }
-  .settings-label { margin-bottom:.5rem; color:var(--muted); font-size:.9rem; font-weight:750; transition:color var(--theme-duration) var(--theme-ease); }
-  #drawSettings { max-width:25rem; line-height:1.45; }
-  .game-panel[data-view="choose"] .game-settings { opacity:0; transform:translateX(1.25rem) scale(.985); visibility:hidden; pointer-events:none; }
-  .game-panel[data-view="settings"] .game-grid { opacity:0; transform:translateX(-1.25rem) scale(.985); visibility:hidden; pointer-events:none; }
   .wait-guy { transform-box:fill-box; transform-origin:50% 100%; animation:wait-bob 2.4s cubic-bezier(.33,0,.67,1) infinite; }
   .wait-guy:nth-of-type(2) { animation-delay:.3s; }
   .wait-guy:nth-of-type(3) { animation-delay:.6s; }
@@ -199,7 +205,7 @@
     .hint { font-size:.8rem; }
     .lobby { grid-template-columns:minmax(0,1fr); align-content:start; gap:1rem; margin-top:0; }
     .lobby-invite { align-self:auto; padding-top:0; }
-    .invite-panel { grid-template-columns:minmax(0,1fr); justify-items:center; gap:.65rem; padding:1rem; border-radius:1.1rem; box-shadow:4px 4px 0 var(--text); text-align:center; }
+    .invite-panel { grid-template-columns:minmax(0,1fr); justify-items:center; gap:.65rem; padding:1rem; border-radius:1.1rem; text-align:center; }
     .qr-frame { width:9rem; }
     .invite-panel .room-code { justify-items:center; }
     .invite-panel .room-code strong { font-size:clamp(1.05rem, 5vw, 1.5rem); }
@@ -207,15 +213,13 @@
     .lobby-room { height:auto; min-height:11rem; padding:1rem; border-radius:1.1rem; }
     .waiting-art { position:static; width:min(8rem, 45%); transform:none; }
     .players { max-height:none; overflow:visible; }
-    .game-panel { height:auto; padding:1rem; border-radius:1.1rem; box-shadow:4px 4px 0 var(--text); }
-    .game-panel-views { flex:none; height:18rem; }
+    .game-panel { height:auto; padding:1rem; border-radius:1.1rem; }
+    .game-grid { flex:none; height:18rem; }
     .game-tile { padding:.6rem .4rem; }
     .game-tile-art { height:3.5rem; }
     .game-tile-description { font-size:.76rem; }
     .game-tile-name { font-size:.85rem; }
     .lobby-invite .btn { margin-top:0; padding:.8rem 1rem; font-size:1rem; }
-    .game-settings .seg { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); }
-    .seg button { font-size:.8rem; }
     #hostError { position:fixed; z-index:5; right:1rem; bottom:.5rem; left:1rem; font-size:.9rem; }
     .sketch-screen .top h1 { font-size:clamp(1.7rem,7vw,2.4rem); }
     .sketch-screen .sketch-clock { font-size:1.3rem; }
@@ -245,13 +249,25 @@
     .row .fill { min-width:2.5rem; padding-right:.5rem; font-size:1rem; }
     .row .who { font-size:.75rem; }
     .gains .pill { font-size:.8rem; }
-    .podium { gap:.65rem; margin-top:1rem; }
-    .step { width:30%; }
-    .step .block { font-size:2.6rem; }
-    .step .n { font-size:.9rem; }
-    .step .s { font-size:.8rem; }
-    .rest { gap:.5rem; margin-top:1rem; }
-    .title { margin-top:1rem; font-size:1rem; }
+    #s-final { min-height:100dvh; gap:.75rem; }
+    .final-top { align-items:center; }
+    .final-top h1 { font-size:2.2rem; }
+    .final-top .hint { padding:.45rem .65rem; font-size:.72rem; }
+    .podium { flex:none; gap:.45rem; width:100%; margin:.5rem auto 0; padding:0; }
+    .podium[data-count="1"] { grid-template-columns:minmax(0, 70%); }
+    .step-player { margin-bottom:.6rem; }
+    .podium-avatar { width:2.5rem; margin-bottom:.35rem; }
+    .step .n { font-size:clamp(.8rem, 4vw, 1rem); }
+    .step .s { font-size:.75rem; }
+    .step .block { min-height:4rem; border-radius:.7rem .7rem 0 0; }
+    .step.place-1 .block { min-height:6.25rem; }
+    .step.place-2 .block { min-height:5rem; }
+    .step.place-3 .block { min-height:4rem; }
+    .step .rank { font-size:2.2rem; }
+    .step .rank-label { font-size:.6rem; }
+    .rest { gap:.45rem; margin-top:.25rem; }
+    .rest .pill { padding:.45rem .65rem; font-size:.75rem; }
+    .title { margin-top:.25rem; padding:.65rem .75rem; font-size:.85rem; }
   }
   @media (min-width:44.01rem) and (max-width:62rem) {
     .lobby { grid-template-columns:minmax(9rem, 13rem) minmax(15rem, 1fr); align-content:start; gap:1.25rem; overflow:auto; padding:.75rem .25rem; }
@@ -260,7 +276,7 @@
     .lobby-room { height:auto; min-height:16rem; }
     .waiting-art { position:static; transform:none; }
     .game-panel { height:auto; }
-    .game-panel-views { flex:none; height:24rem; }
+    .game-grid { flex:none; height:24rem; }
   }
   @media (max-height:36rem) and (min-width:44.01rem) {
     .lobby { align-items:start; overflow:auto; padding:.75rem .25rem; }
@@ -268,14 +284,36 @@
     .lobby-room { height:auto; min-height:15rem; }
     .waiting-art { position:static; transform:none; }
     .game-panel { height:auto; }
-    .game-panel-views { flex:none; height:24rem; }
+    .game-grid { flex:none; height:24rem; }
   }
   @media (min-width:62.01rem) {
     html[data-embed] #s-lobby { padding:2rem 1.5rem; }
     html[data-embed] .lobby { margin-top:0; }
     html[data-embed] .lobby-room, html[data-embed] .game-panel { height:min(35rem, calc(100dvh - 4rem)); }
   }
-  @media (prefers-reduced-motion:reduce) { .row .fill,.btn,.pill,.invite-panel,.invite-link,.lobby-room,.game-panel,.game-tile,.game-tile-ribbon,.game-grid,.game-settings,.game-tile-art,.game-tile-description,.panel-action,.panel-action svg,.seg button,.room-code span,.settings-label,.start-hint,.waiting-art { transition:none; } .screen.on,.wait-guy,.wait-dots circle { animation:none; } }
+  #s-lobby .top { padding-bottom:1.1rem; border-bottom:1px solid var(--edge); }
+  #s-lobby h1 { font-size:clamp(2.4rem, 5vh, 4rem); letter-spacing:-.06em; }
+  #lobbyTitle { padding:0; background:none; }
+  #s-lobby .lobby { gap:clamp(1rem, 2vw, 2rem); }
+  #s-lobby .invite-panel, #s-lobby .game-panel { border:1px solid var(--edge); border-radius:1.1rem; box-shadow:none; }
+  #s-lobby .qr-frame { border:1px solid var(--edge); border-radius:.75rem; }
+  #s-lobby .invite-link { border:0; border-radius:.75rem; background:var(--accent); color:var(--action-ink); box-shadow:none; }
+  #s-lobby .invite-link:hover { transform:translateY(-1px); box-shadow:0 5px 14px rgba(48,52,47,.12); }
+  #s-lobby .invite-link.is-copied { background:var(--accent-soft); color:var(--text); }
+  #s-lobby .lobby-room { border:1px solid var(--edge); border-radius:1.1rem; background:color-mix(in srgb, var(--surface) 90%, #7fb59f 10%); }
+  #s-lobby .count { border-color:var(--edge); font-size:1.2rem; letter-spacing:-.03em; }
+  #s-lobby .player-row { border-color:var(--edge); border-radius:.8rem; box-shadow:none; }
+  #s-lobby .player-avatar { border:0; }
+  #s-lobby .game-panel { padding:1.1rem; }
+  #s-lobby .game-panel-title { font-size:1.55rem; letter-spacing:-.045em; }
+  #s-lobby .game-tile { border:1px solid var(--edge); border-radius:.85rem; background:var(--bg); box-shadow:none; }
+  #s-lobby button.game-tile:not(.is-soon):not([aria-pressed="true"]):is(:hover, :focus-visible) { border-color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent); }
+  #s-lobby .game-tile[aria-pressed="true"] { border-color:var(--accent); background:var(--accent-soft); color:var(--text); box-shadow:inset 0 0 0 1px var(--accent); }
+  #s-lobby .game-tile-ribbon { border:1px solid var(--edge); background:var(--surface); color:var(--muted); }
+  #s-lobby .lobby-invite .btn { border-radius:.8rem; box-shadow:none; }
+  #s-lobby .lobby-invite .btn:disabled { background:var(--edge); color:var(--muted); }
+  #s-lobby .start-hint { font-weight:600; }
+  @media (prefers-reduced-motion:reduce) { .row .fill,.btn,.pill,.invite-panel,.invite-link,.lobby-room,.game-panel,.game-tile,.game-tile-ribbon,.game-grid,.game-tile-art,.game-tile-description,.game-tile-name,.start-hint,.waiting-art { transition:none; } .screen.on,.wait-guy,.wait-dots circle { animation:none; } }
 </style>
 </head>
 <body>
@@ -291,7 +329,7 @@
 </div>
 
 <section class="screen" id="s-lobby">
-  <div class="top"><h1 id="lobbyTitle">Кто из нас?</h1><div class="host-tools">
+  <div class="top"><h1 id="lobbyTitle">Выбери игру</h1><div class="host-tools">
     <div class="theme-switcher theme-control" role="group" aria-label="Тема оформления" data-label="themeLabel">
       <button type="button" data-theme-choice="light" aria-label="Светлая тема" title="Светлая тема" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg></button>
       <button type="button" data-theme-choice="dark" aria-label="Тёмная тема" title="Тёмная тема" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 15.6A8.5 8.5 0 0 1 8.4 3.8 8.6 8.6 0 1 0 20.2 15.6Z"/></svg></button>
@@ -323,54 +361,49 @@
       <span class="share-status" id="shareStatus" aria-live="polite"></span>
     </aside>
     <button class="btn" id="start" aria-describedby="startHint"><span id="startLabel" data-text="start">Начать</span><svg class="icon" aria-hidden="true"><use href="./icons.svg#arrow"/></svg></button>
-    <p class="start-hint" id="startHint" data-text="needPlayers" aria-live="polite">Нужно 2+ игрока</p>
+    <p class="start-hint" id="startHint" aria-live="polite">Выбери игру</p>
     </div>
     <div class="lobby-room">
       <div class="count" id="count" aria-live="polite"></div>
-      <div class="players" id="lobbyPlayers" role="list" aria-label="Игроки"></div>
-      <svg class="waiting-art" viewBox="0 0 300 150" aria-hidden="true">
-        <g stroke="#30342f" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
-          <g class="wait-guy">
-            <path d="M28 146c-4-42 8-72 32-72s36 30 32 72Z" fill="#ee9878"/>
-            <circle cx="51" cy="100" r="7" fill="#fffaf1"/><circle cx="70" cy="100" r="7" fill="#fffaf1"/>
-            <circle cx="53" cy="101" r="3" fill="#30342f" stroke="none"/><circle cx="72" cy="101" r="3" fill="#30342f" stroke="none"/>
-            <path d="M54 117c4 3 9 3 13 0" fill="none"/>
+      <div class="players">
+        <div class="player-list" id="lobbyPlayers" role="list" aria-label="Игроки"></div>
+        <svg class="waiting-art" viewBox="0 0 300 150" aria-hidden="true">
+          <g stroke="#30342f" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
+            <g class="wait-guy">
+              <path d="M28 146c-4-42 8-72 32-72s36 30 32 72Z" fill="#ee9878"/>
+              <circle cx="51" cy="100" r="7" fill="#fffaf1"/><circle cx="70" cy="100" r="7" fill="#fffaf1"/>
+              <circle cx="53" cy="101" r="3" fill="#30342f" stroke="none"/><circle cx="72" cy="101" r="3" fill="#30342f" stroke="none"/>
+              <path d="M54 117c4 3 9 3 13 0" fill="none"/>
+            </g>
+            <g class="wait-guy">
+              <path d="M112 146c-3-56 14-92 38-92s41 36 38 92Z" fill="#7fb59f"/>
+              <circle cx="139" cy="88" r="8" fill="#fffaf1"/><circle cx="162" cy="88" r="8" fill="#fffaf1"/>
+              <circle cx="141" cy="86" r="3.4" fill="#30342f" stroke="none"/><circle cx="164" cy="86" r="3.4" fill="#30342f" stroke="none"/>
+              <ellipse cx="151" cy="108" rx="4" ry="5" fill="#30342f" stroke="none"/>
+            </g>
+            <g class="wait-guy">
+              <path d="M234 70c-2-8 2-14 8-16" fill="none"/>
+              <path d="M242 54c7-3 12 0 13 6-7 2-12 0-13-6Z" fill="#3f7b7e"/>
+              <path d="M210 146c-3-38 10-64 32-64s35 26 32 64Z" fill="#f3be63"/>
+              <circle cx="233" cy="108" r="6.5" fill="#fffaf1"/><circle cx="251" cy="108" r="6.5" fill="#fffaf1"/>
+              <circle cx="231" cy="109" r="2.8" fill="#30342f" stroke="none"/><circle cx="249" cy="109" r="2.8" fill="#30342f" stroke="none"/>
+              <path d="M235 123c4 3 9 3 13 0" fill="none"/>
+            </g>
+            <path d="M8 146h284" fill="none"/>
+            <g>
+              <path d="M176 14h44c7 0 10 4 10 10v12c0 6-3 10-10 10h-24l-12 10 2-10h-10c-7 0-10-4-10-10V24c0-6 3-10 10-10Z" fill="#fffaf1"/>
+              <g class="wait-dots" fill="#30342f" stroke="none"><circle cx="186" cy="30" r="3.5"/><circle cx="198" cy="30" r="3.5"/><circle cx="210" cy="30" r="3.5"/></g>
+            </g>
           </g>
-          <g class="wait-guy">
-            <path d="M112 146c-3-56 14-92 38-92s41 36 38 92Z" fill="#7fb59f"/>
-            <circle cx="139" cy="88" r="8" fill="#fffaf1"/><circle cx="162" cy="88" r="8" fill="#fffaf1"/>
-            <circle cx="141" cy="86" r="3.4" fill="#30342f" stroke="none"/><circle cx="164" cy="86" r="3.4" fill="#30342f" stroke="none"/>
-            <ellipse cx="151" cy="108" rx="4" ry="5" fill="#30342f" stroke="none"/>
-          </g>
-          <g class="wait-guy">
-            <path d="M234 70c-2-8 2-14 8-16" fill="none"/>
-            <path d="M242 54c7-3 12 0 13 6-7 2-12 0-13-6Z" fill="#3f7b7e"/>
-            <path d="M210 146c-3-38 10-64 32-64s35 26 32 64Z" fill="#f3be63"/>
-            <circle cx="233" cy="108" r="6.5" fill="#fffaf1"/><circle cx="251" cy="108" r="6.5" fill="#fffaf1"/>
-            <circle cx="231" cy="109" r="2.8" fill="#30342f" stroke="none"/><circle cx="249" cy="109" r="2.8" fill="#30342f" stroke="none"/>
-            <path d="M235 123c4 3 9 3 13 0" fill="none"/>
-          </g>
-          <path d="M8 146h284" fill="none"/>
-          <g>
-            <path d="M176 14h44c7 0 10 4 10 10v12c0 6-3 10-10 10h-24l-12 10 2-10h-10c-7 0-10-4-10-10V24c0-6 3-10 10-10Z" fill="#fffaf1"/>
-            <g class="wait-dots" fill="#30342f" stroke="none"><circle cx="186" cy="30" r="3.5"/><circle cx="198" cy="30" r="3.5"/><circle cx="210" cy="30" r="3.5"/></g>
-          </g>
-        </g>
-      </svg>
+        </svg>
+      </div>
     </div>
     <section class="game-panel" aria-labelledby="gamePanelTitle" data-view="choose">
       <div class="game-panel-head">
         <h2 class="game-panel-title" id="gamePanelTitle" data-text="chooseGame">Выбери игру</h2>
-        <button class="panel-action" id="gameSettings" type="button" aria-label="Настройки игры" title="Настройки игры" data-label="gameSettings" aria-controls="gameSettingsView">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 2h4l.6 2.3 1.7.7 2-.9 2.8 2.8-.9 2 .7 1.7L23 11v4l-2.3.6-.7 1.7.9 2-2.8 2.8-2-.9-1.7.7L14 24h-4l-.6-2.3-1.7-.7-2 .9-2.8-2.8.9-2-.7-1.7L1 15v-4l2.3-.6.7-1.7-.9-2 2.8-2.8 2 .9 1.7-.7Z" transform="translate(0 -1) scale(1 .92)"/><circle cx="12" cy="12" r="3"/></svg>
-        </button>
-        <button class="panel-action panel-back" id="backToGames" type="button" aria-label="Назад к выбору игры" title="Назад к выбору игры" data-label="backToGames" aria-controls="gameModes" hidden>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5-7 7 7 7M7 12h13"/></svg>
-        </button>
       </div>
-      <div class="game-panel-views">
       <div class="game-grid" id="gameModes" role="group" aria-labelledby="gamePanelTitle">
-        <button class="game-tile" type="button" data-mode="vote" aria-pressed="true">
+        <button class="game-tile" type="button" data-mode="vote" aria-pressed="false">
           <svg class="game-tile-art" viewBox="0 0 120 90" aria-hidden="true">
             <g stroke="#30342f" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
               <path d="M16 86c-2-26 6-42 22-42s24 16 22 42Z" fill="#ee9878"/>
@@ -403,21 +436,17 @@
           <span class="game-tile-description" data-text="drawDescription">Рисуй слово, пока остальные его угадывают.</span>
           <span class="game-tile-name" data-text="drawGame">Рисуй и угадывай</span>
         </button>
-        <div class="game-tile is-soon">
-          <span class="game-tile-ribbon" data-text="soon">Скоро</span>
-          <svg class="game-tile-art" viewBox="0 0 120 90" aria-hidden="true">
-            <g stroke="#30342f" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
-              <path d="M14 84h92" fill="none"/>
-              <rect x="22" y="50" width="18" height="34" rx="3" fill="#ee9878"/>
-              <rect x="50" y="26" width="18" height="58" rx="3" fill="#7fb59f"/>
-              <rect x="78" y="60" width="18" height="24" rx="3" fill="#f3be63"/>
-              <path d="M54 12c0-4 3-6 6-6s6 2 6 6c0 4-6 4-6 8" fill="none"/>
-            </g>
-          </svg>
-          <span class="game-tile-name" data-text="crowdGame">Угадай зал</span>
-        </div>
-        <div class="game-tile is-soon">
-          <span class="game-tile-ribbon" data-text="soon">Скоро</span>
+        <button class="game-tile" type="button" data-mode="dub" aria-pressed="false">
+          <svg class="game-tile-art" viewBox="0 0 120 90" aria-hidden="true"><rect x="12" y="15" width="96" height="60" rx="8" fill="#f3be63" stroke="#30342f" stroke-width="3"/><path d="M25 59h35m-35 8h48" stroke="#30342f" stroke-width="3"/><circle cx="83" cy="43" r="13" fill="#ee9878" stroke="#30342f" stroke-width="3"/></svg>
+          <span class="game-tile-description" data-dub="description">Озвучьте немую сцену по одной реплике.</span>
+          <span class="game-tile-name" data-dub="game">Не тот дубляж</span>
+        </button>
+        <button class="game-tile" type="button" data-mode="crowd" aria-pressed="false">
+          <svg class="game-tile-art" viewBox="0 0 120 90" aria-hidden="true"><path d="M14 76V53h18v23Zm28 0V31h18v45Zm28 0V44h18v32Zm28 0V17h12v59Z" fill="#7fb59f" stroke="#30342f" stroke-width="3"/><path d="M8 77h106" stroke="#30342f" stroke-width="3"/></svg>
+          <span class="game-tile-description" data-crowd="description">Ответь и угадай, что выберет зал.</span>
+          <span class="game-tile-name" data-crowd="game">Угадай зал</span>
+        </button>
+        <button class="game-tile" type="button" data-mode="quiz" aria-pressed="false">
           <svg class="game-tile-art" viewBox="0 0 120 90" aria-hidden="true">
             <g stroke="#30342f" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
               <path d="M48 58c0-8-10-12-10-26a22 22 0 0 1 44 0c0 14-10 18-10 26Z" fill="#f3be63"/>
@@ -427,20 +456,132 @@
               <rect x="14" y="78" width="62" height="8" rx="4" fill="#7fb59f"/>
             </g>
           </svg>
+          <span class="game-tile-description">Выбери ответ и ставку за уверенность.</span>
           <span class="game-tile-name" data-text="quizGame">Квиз с уверенностью</span>
-        </div>
-      </div>
-      <div class="game-settings" id="gameSettingsView" aria-hidden="true" inert>
-        <p class="settings-game-name" id="settingsGameName"></p>
-        <div id="voteSettings">
-          <p class="settings-label" data-text="roundsLabel">Раундов</p>
-          <div class="seg" id="rounds" role="group" aria-label="Число раундов" data-label="roundsLabel"></div>
-          <label class="toggle" id="anonSetting"><input type="checkbox" id="anon"> <span data-text="anonymous">Анонимно</span></label>
-        </div>
-        <p id="drawSettings" data-text="drawSettings" hidden>Каждый игрок рисует по очереди. На ход даётся 65 секунд.</p>
-      </div>
+        </button>
+        <button class="game-tile" type="button" data-mode="duel" aria-pressed="false">
+          <svg class="game-tile-art" viewBox="0 0 120 90" aria-hidden="true"><rect x="8" y="22" width="47" height="48" rx="7" fill="#ee9878" stroke="#30342f" stroke-width="3"/><rect x="65" y="22" width="47" height="48" rx="7" fill="#7fb59f" stroke="#30342f" stroke-width="3"/><path d="M25 39h14M25 49h9m47-10h14m-14 10h9" stroke="#30342f" stroke-width="3"/></svg>
+          <span class="game-tile-description" data-duel="description">Два ответа, один выбор зала.</span>
+          <span class="game-tile-name" data-duel="game">Дуэль нелепых ответов</span>
+        </button>
+        <button class="game-tile" type="button" data-mode="fake" aria-pressed="false">
+          <svg class="game-tile-art" viewBox="0 0 120 90" aria-hidden="true"><rect x="18" y="14" width="84" height="62" rx="6" fill="#fffaf1" stroke="#30342f" stroke-width="3"/><path d="M30 30h55M30 43h43M30 56h49" stroke="#30342f" stroke-width="3"/></svg>
+          <span class="game-tile-description" data-fake="description">Придумай значение слова и найди настоящее.</span>
+          <span class="game-tile-name" data-fake="game">Фальшивое определение</span>
+        </button>
+        <button class="game-tile" type="button" data-mode="telephone" aria-pressed="false">
+          <svg class="game-tile-art" viewBox="0 0 120 90" aria-hidden="true"><rect x="9" y="15" width="40" height="34" rx="5" fill="#7fb59f" stroke="#30342f" stroke-width="3"/><rect x="71" y="41" width="40" height="34" rx="5" fill="#f3be63" stroke="#30342f" stroke-width="3"/><path d="M49 32h23l-7-6m7 6-7 6" fill="none" stroke="#30342f" stroke-width="3"/></svg>
+          <span class="game-tile-description" data-telephone="description">Рисунок становится фразой, фраза — новым рисунком.</span><span class="game-tile-name" data-telephone="game">Телефон без слов</span>
+        </button>
+        <button class="game-tile" type="button" data-mode="dictation" aria-pressed="false">
+          <svg class="game-tile-art" viewBox="0 0 120 90" aria-hidden="true"><path d="M18 20h32v22H18zM70 22l25 39-30 17-25-39z" fill="#fffaf1" stroke="#30342f" stroke-width="3"/><path d="M26 31h16M60 52l14 18M82 25l11-14" stroke="#30342f" stroke-width="3" stroke-linecap="round"/></svg>
+          <span class="game-tile-description" data-dictation="description">Один объясняет рисунок голосом, остальные рисуют и угадывают.</span>
+          <span class="game-tile-name" data-dictation="game">Рисуй по словам</span>
+        </button>
+        <button class="game-tile" type="button" data-mode="show" aria-pressed="false">
+          <svg class="game-tile-art" viewBox="0 0 120 90" aria-hidden="true"><circle cx="45" cy="27" r="12" fill="#f3be63" stroke="#30342f" stroke-width="3"/><path d="M45 39v35m0-24-24 15m24-15 24 15M45 73 29 87m16-14 16 14" fill="none" stroke="#30342f" stroke-width="3"/><path d="M80 20h28v25H80l-8 8v-8h-5V20Z" fill="#fffaf1" stroke="#30342f" stroke-width="3"/></svg>
+          <span class="game-tile-description" data-show="description">Один показывает слово, остальные угадывают.</span><span class="game-tile-name" data-show="game">Покажи, не говори</span>
+        </button>
+        <button class="game-tile" type="button" data-mode="impostor" aria-pressed="false">
+          <svg class="game-tile-art" viewBox="0 0 120 90" aria-hidden="true"><circle cx="28" cy="36" r="11" fill="#7fb59f" stroke="#30342f" stroke-width="3"/><circle cx="60" cy="36" r="11" fill="#7fb59f" stroke="#30342f" stroke-width="3"/><circle cx="92" cy="36" r="11" fill="#ee9878" stroke="#30342f" stroke-width="3"/><path d="M11 77q2-25 17-25t17 25M43 77q2-25 17-25t17 25M75 77q2-25 17-25t17 25" fill="none" stroke="#30342f" stroke-width="3"/></svg>
+          <span class="game-tile-description" data-impostor="description">Дай подсказку, найди игрока с другой темой.</span><span class="game-tile-name" data-impostor="game">Самозванец</span>
+        </button>
+        <button class="game-tile" type="button" data-mode="tower" aria-pressed="false">
+          <svg class="game-tile-art" viewBox="0 0 120 90" aria-hidden="true"><rect x="25" y="69" width="70" height="15" fill="#ee9878" stroke="#30342f" stroke-width="3"/><rect x="31" y="53" width="58" height="16" fill="#f3be63" stroke="#30342f" stroke-width="3"/><rect x="37" y="37" width="46" height="16" fill="#7fb59f" stroke="#30342f" stroke-width="3"/><path d="M50 37V17h20v20" fill="#fffaf1" stroke="#30342f" stroke-width="3"/></svg>
+          <span class="game-tile-description" data-tower="description">Команды отвечают, чтобы достроить общую башню.</span><span class="game-tile-name" data-tower="game">Спаси башню</span>
+        </button>
+        <button class="game-tile" type="button" data-mode="monster" aria-pressed="false">
+          <svg class="game-tile-art" viewBox="0 0 120 90" aria-hidden="true"><path d="M24 75V48q0-27 36-27t36 27v27Z" fill="#ee9878" stroke="#30342f" stroke-width="3"/><circle cx="45" cy="48" r="6" fill="#30342f"/><circle cx="75" cy="48" r="6" fill="#30342f"/><path d="M47 64q13 10 26 0M34 28 28 8l22 14m36 6 6-20-22 14" fill="none" stroke="#30342f" stroke-width="3"/></svg>
+          <span class="game-tile-description" data-monster="description">Собери монстра и проголосуй за образ.</span><span class="game-tile-name" data-monster="game">Монстр на подиуме</span>
+        </button>
       </div>
     </section>
+  </div>
+</section>
+
+<section class="screen duel-screen" id="s-monster">
+  <div class="top"><span id="monsterPhase"></span><span class="sketch-clock" id="monsterClock"></span></div>
+  <div class="duel-main"><h1 id="monsterCategory"></h1><p id="monsterStatus" role="status"></p><div id="monsterCards"></div><div class="bar"><button id="monsterPrevious" type="button"></button><span id="monsterPage"></span><button id="monsterForward" type="button"></button></div></div>
+  <div class="bar"><button class="btn" id="monsterAdvance"></button><button class="btn" id="monsterNext"></button><button class="btn quiet" id="monsterLobby"></button></div>
+</section>
+
+<section class="screen duel-screen" id="s-tower">
+  <div class="top"><span id="towerPhase"></span><span class="sketch-clock" id="towerClock"></span></div>
+  <div class="duel-main"><h1 id="towerQuestion"></h1><p id="towerProgress" role="status"></p><div id="towerFloors" aria-hidden="true"></div><ol id="towerOptions"></ol><div id="towerTeams"></div><h2 id="towerOutcome"></h2></div>
+  <div class="bar"><button class="btn" id="towerAdvance"></button><button class="btn" id="towerNext"></button><button class="btn quiet" id="towerLobby"></button></div>
+</section>
+
+<section class="screen duel-screen" id="s-impostor">
+  <div class="top"><h1 id="impostorTitle"></h1><span class="sketch-clock" id="impostorClock"></span></div>
+  <div class="duel-main"><div class="duel-cards" id="impostorTables"></div></div>
+  <div class="bar"><button class="btn" id="impostorAdvance"></button><button class="btn" id="impostorNext"></button><button class="btn quiet" id="impostorLobby"></button></div>
+</section>
+
+<section class="screen duel-screen" id="s-show">
+  <div class="top"><h1 id="showTitle"></h1><span class="sketch-clock" id="showClock"></span></div>
+  <div class="duel-main"><h2 id="showActor"></h2><p id="showStatus" role="status"></p><h2 id="showWord" hidden></h2><p id="showSolvers"></p></div>
+  <div class="bar"><button class="btn" id="showAdvance"></button><button class="btn" id="showNext"></button><button class="btn quiet" id="showLobby"></button></div>
+</section>
+
+<section class="screen duel-screen" id="s-telephone">
+  <div class="top"><h1 id="telephoneTitle"></h1></div>
+  <div class="duel-main"><p id="telephoneStatus" role="status"></p><div id="telephoneCards"></div></div>
+  <div class="bar"><button class="btn" id="telephoneAdvance"></button><button class="btn" id="telephoneNext"></button><button class="btn quiet" id="telephoneLobby"></button></div>
+</section>
+<section class="screen duel-screen" id="s-dictation">
+  <div class="top"><h1 id="dictationTitle"></h1><span id="dictationRound"></span></div>
+  <div class="dictation-main"><p id="dictationStatus" role="status"></p><p id="dictationRule" class="dictation-copy"></p><p id="dictationTime" role="timer"></p>
+    <p id="dictationAnswer"></p><div id="dictationGallery" class="dictation-gallery"></div><div id="dictationScores"></div></div>
+  <div class="bar"><button class="btn" id="dictationCancel"></button><button class="btn" id="dictationNext"></button><button class="btn" id="dictationRetry"></button><button class="btn quiet" id="dictationLobby"></button></div>
+</section>
+
+<section class="screen duel-screen" id="s-fake">
+  <div class="top"><span id="fakeRound"></span><span class="sketch-clock" id="fakeClock"></span></div>
+  <div class="duel-main"><p class="lead" id="fakePhase"></p><h1 id="fakeWord"></h1><p id="fakeStatus" role="status"></p><div class="duel-cards" id="fakeCards"></div><a id="fakeSource" hidden target="_blank" rel="noopener noreferrer"></a></div>
+  <div class="bar"><button class="btn" id="fakeAdvance"></button><button class="btn" id="fakeNext"></button><button class="btn quiet" id="fakeLobby"></button></div>
+</section>
+
+<section class="screen duel-screen" id="s-duel">
+  <div class="top"><span id="duelRound"></span><span class="sketch-clock" id="duelClock"></span></div>
+  <div class="duel-main"><p class="lead" id="duelPhase"></p><h1 id="duelPrompt"></h1><p id="duelStatus" role="status"></p><div class="duel-cards" id="duelCards"></div></div>
+  <div class="bar"><button class="btn" id="duelAdvance"></button><button class="btn" id="duelNext"></button><button class="btn quiet" id="duelLobby"></button></div>
+</section>
+
+<section class="screen quiz-screen" id="s-quiz">
+  <div class="top"><span id="quizRound"></span><span class="sketch-clock" id="quizClock"></span></div>
+  <div class="quiz-main"><p class="lead" id="quizPhase"></p><h1 id="quizQuestion"></h1><p id="quizRule"></p><ol id="quizOptions"></ol><p id="quizStatus" role="status"></p></div>
+  <div class="bar"><button class="btn" id="quizAdvance"></button><button class="btn" id="quizNext"></button><button class="btn quiet" id="quizLobby"></button></div>
+</section>
+
+<section class="screen crowd-screen" id="s-crowd">
+  <div class="top"><span id="crowdRound"></span><span class="sketch-clock" id="crowdClock"></span></div>
+  <div class="crowd-main"><p class="lead" id="crowdPhase"></p><h1 id="crowdQuestion"></h1><ol id="crowdOptions"></ol><p id="crowdStatus" role="status"></p></div>
+  <div class="bar"><button class="btn" id="crowdAdvance"></button><button class="btn" id="crowdNext"></button><button class="btn quiet" id="crowdLobby"></button></div>
+</section>
+
+<section class="screen dub-screen" id="s-dub">
+  <div class="top"><div><span id="dubKicker"></span><h1 id="dubTitle"></h1></div><span class="sketch-clock" id="dubClock"></span></div>
+  <div class="dub-layout">
+    <div class="dub-main"><div id="dubStage"></div></div>
+    <aside class="dub-side"><div class="dub-status" id="dubStatus" role="status"></div><p class="dub-sub" id="dubSub"></p><ol class="dub-slots" id="dubSlots"></ol></aside>
+  </div>
+  <div class="dub-bar">
+    <button class="btn" id="dubStartNow" data-dub="startNow">Начать запись</button>
+    <button class="btn quiet" id="dubSoundCheck" data-dub="soundCheck">Проверить звук</button>
+    <button class="btn quiet" id="dubExtend"><span id="dubExtendLabel"></span></button>
+    <button class="btn quiet" id="dubReopen" data-dub="reopen">Вернуть реплику</button>
+    <button class="btn quiet" id="dubFinish" data-dub="finish">Завершить с пропусками</button>
+    <button class="btn" id="dubWatch" data-dub="watch">Смотреть дубляж</button>
+    <button class="btn quiet" id="dubTexts" data-dub="showTexts">Показать реплики игроков</button>
+    <button class="btn quiet" id="dubUnmute" data-dub="enableSound">Включить звук</button>
+    <button class="btn quiet" id="dubReplay" data-dub="replay">С начала</button>
+    <button class="btn" id="dubContinue" data-dub="continue">Дальше</button>
+    <button class="btn" id="dubCloseVote" data-dub="closeVote">Закрыть голосование</button>
+    <button class="btn" id="dubNextScene" data-dub="nextScene">Следующая сцена</button>
+    <button class="btn quiet" id="dubSkipScene" data-dub="skipScene">Пропустить сцену</button>
+    <button class="btn quiet" id="dubToLobby" data-dub="toLobby">В лобби</button>
+    <button class="btn quiet" id="dubCancel" data-dub="cancel">Отменить раунд</button>
+    <p class="dub-hint" id="dubHint"></p>
   </div>
 </section>
 
@@ -494,15 +635,29 @@
 </section>
 
 <section class="screen" id="s-final">
-  <div class="top"><h1 data-text="results">Итоги</h1><span class="hint"><kbd data-text="spaceKey">Пробел</kbd> <span data-text="newGame">Новая игра</span></span></div>
-  <div class="podium" id="podium"></div>
+  <div class="top final-top"><h1 data-text="results">Итоги</h1><span class="hint"><kbd data-text="spaceKey">Пробел</kbd> <span data-text="newGame">Новая игра</span></span></div>
+  <div class="podium" id="podium" role="list"></div>
   <div class="rest" id="rest"></div>
-  <div class="title" id="titles"></div>
+  <div class="title" id="titles" hidden></div>
   <div class="bar"><button class="btn" id="again"><svg class="icon" aria-hidden="true"><use href="./icons.svg#reset"/></svg><span data-text="newGame">Новая игра</span></button></div>
 </section>
 
 <p id="hostError" role="alert"></p>
 <script src="./drawing-client.js"></script>
+<script src="./dub-client.js"></script>
+<script src="./dub-host.js"></script>
+<script src="./crowd-ui.js"></script>
+<script src="./quiz-ui.js"></script>
+<script src="./duel-ui.js"></script>
+<script src="./fake-ui.js"></script>
+<script src="./telephone-ui.js"></script>
+<script src="./dictation-ui.js"></script>
+<script src="./show-ui.js"></script>
+<script src="./impostor-ui.js"></script>
+<script src="./tower-ui.js"></script>
+<script src="./monster-ui.js"></script>
+<script src="./avatar-types.js"></script>
+<script src="./avatar-art.js"></script>
 <script>
 document.querySelectorAll('.drifters span').forEach(element => {
   element.style.setProperty('--x', `${3 + Math.random() * 92}%`);
@@ -514,14 +669,66 @@ const params = new URLSearchParams(location.search);
 const locale = ['ru', 'en', 'kk'].includes(params.get('shumyLang') || params.get('lang'))
   ? params.get('shumyLang') || params.get('lang')
   : 'ru';
+const modeCopy = {
+  ru: {
+    vote:['Кто из нас?', 'Выбери, кто из друзей лучше подходит к вопросу.'],
+    draw:['Рисуй и угадывай', 'Рисуй слово, пока остальные его угадывают.'],
+    dub:['Не тот дубляж', 'Озвучьте немую сцену по одной реплике.'],
+    crowd:['Угадай зал', 'Ответь и угадай, что выберет зал.'],
+    quiz:['Квиз с уверенностью', 'Выбери ответ и ставку за уверенность.'],
+    duel:['Дуэль нелепых ответов', 'Два ответа, один выбор зала.'],
+    fake:['Фальшивое определение', 'Придумай значение слова и найди настоящее.'],
+    telephone:['Телефон без слов', 'Рисунок становится фразой, фраза — новым рисунком.'],
+    dictation:['Рисуй по словам', 'Один объясняет рисунок голосом, остальные рисуют и угадывают.'],
+    show:['Покажи, не говори', 'Один показывает слово, остальные угадывают.'],
+    impostor:['Самозванец', 'Дай подсказку, найди игрока с другой темой.'],
+    tower:['Спаси башню', 'Команды отвечают, чтобы достроить общую башню.'],
+    monster:['Монстр на подиуме', 'Собери монстра и проголосуй за образ.'],
+  },
+  en: {
+    vote:['Who’s most likely?', 'Pick the friend who best fits the prompt.'],
+    draw:['Draw and guess', 'Draw a word while everyone else guesses.'],
+    dub:['Wrong Dub', 'Dub a silent scene, one line at a time.'],
+    crowd:['Guess the Crowd', 'Answer, then predict what the group will choose.'],
+    quiz:['Confident Quiz', 'Choose an answer and how confident you are.'],
+    duel:['Duel of Absurd Answers', 'Two answers compete for the group’s pick.'],
+    fake:['Fake Definition', 'Invent a definition, then find the real one.'],
+    telephone:['Telephone Without Words', 'Pass a drawing and phrase along a chain.'],
+    dictation:['Draw by Directions', 'One player gives directions; everyone draws and guesses.'],
+    show:['Show, Don’t Tell', 'Act out a word while everyone guesses.'],
+    impostor:['The Impostor', 'Give clues, then find who got a different topic.'],
+    tower:['Save the Tower', 'Answer as a team to build one tower.'],
+    monster:['Monster Runway', 'Build a monster and vote for your favorite.'],
+  },
+  kk: {
+    vote:['Кім көбірек?', 'Сұраққа көбірек сай келетін досты таңда.'],
+    draw:['Сурет сал да тап', 'Сөзді сал, қалғандары оны табады.'],
+    dub:['Қате дубляж', 'Үнсіз көрініске кезекпен дауыс қос.'],
+    crowd:['Көпшілікті тап', 'Жауап беріп, залдың таңдауын болжа.'],
+    quiz:['Сенімді квиз', 'Жауап пен сенімділік деңгейін таңда.'],
+    duel:['Күлкілі жауаптар жекпе-жегі', 'Екі жауаптың бірін зал таңдайды.'],
+    fake:['Жалған анықтама', 'Мағына ойлап тап та, шын анықтаманы тап.'],
+    telephone:['Сөзсіз телефон', 'Сурет пен сөйлем тізбекпен беріледі.'],
+    dictation:['Айтқандай сал', 'Бір ойыншы түсіндіреді, қалғандары салады және табады.'],
+    show:['Көрсет, айтпа', 'Сөзді қимылмен көрсет, қалғандары тапсын.'],
+    impostor:['Жалған ойыншы', 'Ишара беріп, басқа тақырып алған ойыншыны тап.'],
+    tower:['Мұнараны құтқар', 'Командамен жауап беріп, мұнара тұрғыз.'],
+    monster:['Монстрлар подиумы', 'Монстр құрастырып, ұнағанына дауыс бер.'],
+  },
+};
+document.querySelectorAll('#gameModes [data-mode]').forEach(button => {
+  const [name, description] = modeCopy[locale][button.dataset.mode];
+  button.querySelector('.game-tile-name').textContent = name;
+  const detail = button.querySelector('.game-tile-description');
+  if (detail) detail.textContent = description;
+});
 const text = {
   ru: {
     hostScreen:'Экран ведущего', voteGame:'Кто из нас?', drawGame:'Рисуй и угадывай', chooseGame:'Выбери игру',
     soon:'Скоро', crowdGame:'Угадай зал', quizGame:'Квиз с уверенностью', roomCodeLabel:'Код комнаты', joinGame:'Подключение к игре',
     voteDescription:'Выбери, кто из друзей лучше подходит к вопросу.', drawDescription:'Рисуй слово, пока остальные его угадывают.',
-    gameSettings:'Настройки игры', backToGames:'Назад к выбору игры', roundsLabel:'Раундов', drawSettings:'Каждый игрок рисует по очереди. На ход даётся 65 секунд.',
-    waiting:'Ждём игроков…', playerCount:'Игроков: {count}', anonymous:'Анонимно', rounds:'{count} раундов',
-    needPlayers:'Нужно 2+ игрока', start:'Начать', showQr:'QR-код для входа',
+    waiting:'Ждём игроков…', playerCount:'Игроков: {count}',
+    chooseFirst:'Сначала выбери игру', playersNeed:'Игроков: {count} из {min} необходимых', playersLimit:'Слишком много игроков: {count} (максимум {max})', scenesUnavailable:'Нет доступных сцен', start:'Начать', showQr:'QR-код для входа',
     copyLink:'Скопировать ссылку', copied:'Ссылка скопирована', themeLabel:'Тема оформления',
     lightTheme:'Светлая тема', darkTheme:'Тёмная тема', spaceKey:'Пробел', fullscreen:'Полный экран',
     roundDrawing:'Рисунок раунда', turnMap:'Карта ходов', voteLead:'Кто из нас скорее всего…',
@@ -530,17 +737,16 @@ const text = {
     solved:'Угадали: {count}', artistPoints:'Художнику +{points}', moreDrawing:'Ещё рисуем для {count}',
     votes:'Голосов: {votes} / {players}', noVotes:'Никто не проголосовал', votedBy:'голосовали: {names}',
     majority:'Угадали большинство:', noMajority:'Никто не угадал большинство',
-    score:'{score} очков', place:'{place}-е место, {name}, {score} очков',
+    score:'{score} очков', place:'{place}-е место, {name}, {score} очков', rankLabel:'место',
     mostPicked:'Чаще всех «тот самый из нас»: {name} ({count} раз)',
     showWord:'Показать слово', nextTurn:'Следующий ход', nobody:'Игрок вышел', you:'ты'
   },
   en: {
-    hostScreen:'Host screen', voteGame:'Who’s most likely?', drawGame:'Draw and guess', chooseGame:'Choose a game',
+    hostScreen:'Host screen', voteGame:'Who’s most likely?', drawGame:'Draw and guess', chooseGame:'Games',
     soon:'Soon', crowdGame:'Guess the crowd', quizGame:'Confident quiz', roomCodeLabel:'Room code', joinGame:'Join the game',
     voteDescription:'Pick the friend who best fits the prompt.', drawDescription:'Draw a word while everyone else guesses.',
-    gameSettings:'Game settings', backToGames:'Back to games', roundsLabel:'Rounds', drawSettings:'Players draw in turn. Each turn lasts 65 seconds.',
-    waiting:'Waiting for players…', playerCount:'Players: {count}', anonymous:'Anonymous voting', rounds:'{count} rounds',
-    needPlayers:'Need 2+ players', start:'Start', showQr:'QR code to join',
+    waiting:'Waiting for players…', playerCount:'Players: {count}',
+    chooseFirst:'Choose a game first', playersNeed:'Players: {count} of {min} required', playersLimit:'Too many players: {count} (max {max})', scenesUnavailable:'No playable scenes available', start:'Start', showQr:'QR code to join',
     copyLink:'Copy link', copied:'Link copied', themeLabel:'Theme',
     lightTheme:'Light theme', darkTheme:'Dark theme', spaceKey:'Space', fullscreen:'Full screen',
     roundDrawing:'Round drawing', turnMap:'Turn map', voteLead:'Who’s most likely to…',
@@ -549,7 +755,7 @@ const text = {
     solved:'Guessed: {count}', artistPoints:'Artist +{points}', moreDrawing:'Still drawing for {count}',
     votes:'Votes: {votes} / {players}', noVotes:'No one voted', votedBy:'voted for: {names}',
     majority:'Guessed the majority:', noMajority:'No one guessed the majority',
-    score:'{score} points', place:'{place}: {name}, {score} points',
+    score:'{score} points', place:'{place}: {name}, {score} points', rankLabel:'place',
     mostPicked:'Most often picked: {name} ({count} times)',
     showWord:'Reveal the word', nextTurn:'Next turn', nobody:'Player left', you:'you'
   },
@@ -557,9 +763,8 @@ const text = {
     hostScreen:'Жүргізуші экраны', voteGame:'Кім көбірек?', drawGame:'Сурет сал да тап', chooseGame:'Ойынды таңда',
     soon:'Жақында', crowdGame:'Көпшілікті тап', quizGame:'Сенімді викторина', roomCodeLabel:'Бөлме коды', joinGame:'Ойынға қосылу',
     voteDescription:'Сұраққа көбірек сай келетін досты таңда.', drawDescription:'Сөзді сал, қалғандары оны табады.',
-    gameSettings:'Ойын баптаулары', backToGames:'Ойын таңдауға оралу', roundsLabel:'Раунд саны', drawSettings:'Ойыншылар кезекпен сурет салады. Әр кезекке 65 секунд беріледі.',
-    waiting:'Ойыншыларды күтіп отырмыз…', playerCount:'Ойыншылар: {count}', anonymous:'Жасырын дауыс беру', rounds:'{count} раунд',
-    needPlayers:'Кемінде 2 ойыншы керек', start:'Бастау', showQr:'Қосылуға арналған QR-код',
+    waiting:'Ойыншыларды күтіп отырмыз…', playerCount:'Ойыншылар: {count}',
+    chooseFirst:'Алдымен ойынды таңда', playersNeed:'Ойыншылар: {count} / {min} қажет', playersLimit:'Ойыншы тым көп: {count} (ең көбі {max})', scenesUnavailable:'Қолжетімді көріністер жоқ', start:'Бастау', showQr:'Қосылуға арналған QR-код',
     copyLink:'Сілтемені көшіру', copied:'Сілтеме көшірілді', themeLabel:'Тақырып',
     lightTheme:'Ашық тақырып', darkTheme:'Қараңғы тақырып', spaceKey:'Бос орын', fullscreen:'Толық экран',
     roundDrawing:'Раунд суреті', turnMap:'Кезек картасы', voteLead:'Кім көбірек…',
@@ -568,14 +773,14 @@ const text = {
     solved:'Тапты: {count}', artistPoints:'Суретшіге +{points}', moreDrawing:'Тағы {count} ойыншы сурет салып жатыр',
     votes:'Дауыс: {votes} / {players}', noVotes:'Ешкім дауыс бермеді', votedBy:'дауыс берді: {names}',
     majority:'Көпшілікті тапты:', noMajority:'Көпшілікті ешкім таппады',
-    score:'{score} ұпай', place:'{place}-орын, {name}, {score} ұпай',
+    score:'{score} ұпай', place:'{place}-орын, {name}, {score} ұпай', rankLabel:'орын',
     mostPicked:'Ең жиі таңдалған: {name} ({count} рет)',
     showWord:'Сөзді көрсету', nextTurn:'Келесі кезек', nobody:'Ойыншы шықты', you:'сен'
   }
 }[locale];
 const t = (key, values = {}) => Object.entries(values).reduce((value, [name, replacement]) => value.replaceAll(`{${name}}`, () => String(replacement)), text[key] ?? text.ru[key] ?? key);
 document.documentElement.lang = locale;
-document.title = `${t('voteGame')} · ${t('hostScreen')}`;
+document.title = `${t('chooseGame')} · ${t('hostScreen')}`;
 document.querySelectorAll('[data-text]').forEach(element => { element.textContent = t(element.dataset.text); });
 document.querySelectorAll('[data-label]').forEach(element => element.setAttribute('aria-label', t(element.dataset.label)));
 document.querySelectorAll('[data-theme-choice]').forEach(button => {
@@ -586,9 +791,6 @@ document.querySelectorAll('[data-theme-choice]').forEach(button => {
 $('qr').alt = t('showQr');
 $('inviteLink').setAttribute('aria-label', t('copyLink'));
 $('inviteLink').title = t('copyLink');
-for (const id of ['gameSettings', 'backToGames']) {
-  $(id).title = t(id);
-}
 document.querySelector('.qtext')?.setAttribute('aria-label', t('voteLead'));
 document.getElementById('sketchCanvas').setAttribute('aria-label', t('roundDrawing'));
 const room = params.get('room') || '';
@@ -622,7 +824,7 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
 const byId = id => S.players.find(p => p.id === id);
 const pill = (p, text = p.name, extra = '') => `<span class="pill ${extra}"><span class="dot" style="--player:${p.color}"></span>${esc(text)}</span>`;
 const lobbyPlayer = player => `<div class="player-row ${player.online ? '' : 'off'}" role="listitem" style="--player:${player.color}">
-  <span class="player-avatar" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="11" r="6" fill="var(--text)"/><path d="M5 29c.5-7 4.5-11 11-11s10.5 4 11 11" fill="var(--text)"/></svg></span>
+  <span class="player-avatar" title="${esc(AvatarArt.avatarTitle(player.avatar, locale))}">${AvatarArt.avatarSvg(player.avatar) || '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="11" r="6" fill="var(--text)"/><path d="M5 29c.5-7 4.5-11 11-11s10.5 4 11 11" fill="var(--text)"/></svg>'}</span>
   <span class="player-name">${esc(player.name)}</span>${player.online ? '' : `<span class="player-status">${locale === 'en' ? 'Away' : locale === 'kk' ? 'Желіде жоқ' : 'Не в сети'}</span>`}
 </div>`;
 
@@ -664,23 +866,11 @@ async function colorQrFinders() {
 $('qr').src = './qr.svg?' + new URLSearchParams({ room, lang: locale });
 $('qr').addEventListener('load', colorQrFinders, { once: true });
 $('roomCode').textContent = room;
-function setGamePanelView(view) {
-  const settings = view === 'settings';
-  document.querySelector('.game-panel').dataset.view = view;
-  $('gameModes').inert = settings;
-  $('gameModes').setAttribute('aria-hidden', String(settings));
-  $('gameSettingsView').inert = !settings;
-  $('gameSettingsView').setAttribute('aria-hidden', String(!settings));
-  $('gameSettings').hidden = settings;
-  $('backToGames').hidden = !settings;
-  $('gamePanelTitle').textContent = t(settings ? 'gameSettings' : 'chooseGame');
-}
 const joinUrl = () => {
   const url = new URL(S?.joinUrl || location.href);
   url.searchParams.set('lang', locale);
   return url.href;
 };
-const roundCount = count => t('rounds', { count });
 const playerCount = count => {
   if (locale === 'en') return `${count} ${count === 1 ? 'player' : 'players'}`;
   if (locale === 'kk') return `${count} ойыншы`;
@@ -730,32 +920,44 @@ function renderSketch() {
 }
 
 function render() {
-  document.documentElement.dataset.gameMode = S.mode === 'draw' ? 'draw' : 'vote';
-  show(S.drawing ? 'sketch' : S.phase);
+  document.documentElement.dataset.gameMode = S.mode;
+  show(S.phase === 'dictation' ? 'dictation' : S.phase === 'monster' ? 'monster' : S.phase === 'tower' ? 'tower' : S.phase === 'impostor' ? 'impostor' : S.phase === 'show' ? 'show' : S.phase === 'telephone' ? 'telephone' : S.phase === 'fake' ? 'fake' : S.phase === 'duel' ? 'duel' : S.phase === 'dub' ? 'dub' : S.phase === 'crowd' ? 'crowd' : S.phase === 'quiz' ? 'quiz' : S.drawing ? 'sketch' : S.phase);
   sketchBoard.select(S.drawing?.id ?? null);
   if (S.drawing) renderSketch();
+  if (S.phase === 'dub') DubHost.render(S);
+  if (S.phase === 'crowd') CrowdUi.renderHost(S);
+  if (S.phase === 'quiz') QuizUi.renderHost(S);
+  if (S.phase === 'duel') DuelUi.renderHost(S);
+  if (S.phase === 'fake') FakeUi.renderHost(S);
+  if (S.phase === 'telephone') TelephoneUi.renderHost(S);
+  if (S.phase === 'dictation') DictationUi.renderHost(S);
+  if (S.phase === 'show') ShowUi.renderHost(S);
+  if (S.phase === 'impostor') ImpostorUi.renderHost(S);
+  if (S.phase === 'tower') TowerUi.renderHost(S);
+  if (S.phase === 'monster') MonsterUi.renderHost(S);
   if (S.phase === 'lobby') {
-    $('lobbyTitle').textContent = S.mode === 'draw' ? t('drawGame') : t('voteGame');
+    $('lobbyTitle').textContent = S.mode === 'dictation' ? DictationUi.t(locale, 'game') : S.mode === 'monster' ? MonsterUi.t(locale, 'game') : S.mode === 'tower' ? TowerUi.t(locale, 'game') : S.mode === 'impostor' ? ImpostorUi.t(locale, 'game') : S.mode === 'show' ? ShowUi.t(locale, 'game') : S.mode === 'telephone' ? TelephoneUi.t(locale, 'game') : S.mode === 'fake' ? FakeUi.t(locale, 'game') : S.mode === 'duel' ? DuelUi.t(locale, 'game') : S.mode === 'quiz' ? QuizUi.t(locale, 'game') : S.mode === 'crowd' ? CrowdUi.t(locale, 'game') : S.mode === 'dub' ? Dub.strings(locale)('game') : S.mode === 'draw' ? t('drawGame') : S.mode === 'vote' ? t('voteGame') : t('chooseGame');
+    document.title = `${$('lobbyTitle').textContent} · ${t('hostScreen')}`;
     const drawing = S.mode === 'draw';
-    const n = drawing ? S.players.filter(p => p.online).length : S.players.length;
+    const n = drawing || S.mode === 'dictation' ? S.players.filter(p => p.online).length : S.players.length;
     $('count').textContent = n ? playerCount(n) : t('waiting');
     document.querySelector('.lobby-room').classList.toggle('is-waiting', n < 2);
     $('lobbyPlayers').innerHTML = S.players.map(lobbyPlayer).join('');
-    $('rounds').innerHTML = [5, 10, 15, 20].map(r => `<button class="${r === S.totalRounds ? 'sel' : ''}" aria-pressed="${r === S.totalRounds}" data-r="${r}">${roundCount(r)}</button>`).join('');
-    $('anon').checked = S.anonymous;
-    $('anonSetting').hidden = drawing;
-    $('rounds').hidden = drawing;
-    $('voteSettings').hidden = drawing;
-    $('drawSettings').hidden = !drawing;
-    $('settingsGameName').textContent = t(drawing ? 'drawGame' : 'voteGame');
     for (const button of $('gameModes').querySelectorAll('[data-mode]')) {
       const selected = button.dataset.mode === S.mode;
       button.classList.toggle('sel', selected);
       button.setAttribute('aria-pressed', String(selected));
     }
-    $('start').disabled = n < 2;
+    const minimum = { telephone:4, impostor:4, tower:4, duel:3, fake:3, show:3, dictation:3 }[S.mode] ?? 2;
+    const maximum = { telephone:8, fake:8, show:20, monster:20, impostor:12, tower:12 }[S.mode] ?? Infinity;
+    const missingScene = S.mode === 'dub' && !S.dubScenes?.some(item => !item.problem);
+    $('start').disabled = !S.mode || n < minimum || n > maximum || missingScene;
     $('startLabel').textContent = t('start');
-    $('startHint').hidden = n >= 2;
+    $('startHint').hidden = !$('start').disabled;
+    if (!S.mode) $('startHint').textContent = t('chooseFirst');
+    else if (n < minimum) $('startHint').textContent = t('playersNeed', { count:n, min:minimum });
+    else if (n > maximum) $('startHint').textContent = t('playersLimit', { count:n, max:maximum });
+    else if (missingScene) $('startHint').textContent = t('scenesUnavailable');
   }
   if (S.phase === 'question') {
     $('qround').textContent = t('round', { round: S.round, total: S.totalRounds });
@@ -792,12 +994,18 @@ function render() {
     const ranked = S.players.filter(p => S.mode !== 'draw' || S.drawRoute.some(player => player.id === p.id))
       .sort((a, b) => b.score - a.score);
     const order = [1, 0, 2].filter(i => ranked[i]);
-    const h = [36, 26, 18];
+    $('podium').dataset.count = String(order.length);
     $('podium').innerHTML = order.map(i => { const p = ranked[i];
-      return `<div class="step"><div class="n">${esc(p.name)}</div><div class="s">${t('score', { score: p.score })}</div>
-        <div class="block" style="height:${h[i]}vh;--player:${p.color}">${i + 1}</div></div>`; }).join('');
+      return `<div class="step place-${i + 1}" role="listitem">
+        <div class="step-player">
+          <span class="podium-avatar" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="11" r="6" fill="currentColor"/><path d="M5 29c.5-7 4.5-11 11-11s10.5 4 11 11" fill="currentColor"/></svg></span>
+          <span class="n">${esc(p.name)}</span><span class="s">${t('score', { score: p.score })}</span>
+        </div>
+        <div class="block"><span class="rank">${i + 1}</span><span class="rank-label">${t('rankLabel')}</span></div>
+      </div>`; }).join('');
     $('rest').innerHTML = ranked.slice(3).map((p, i) => pill(p, t('place', { place: i + 4, name: p.name, score: p.score }))).join('');
     const top = [...S.players].sort((a, b) => b.timesPicked - a.timesPicked)[0];
+    $('titles').hidden = !top || !top.timesPicked;
     $('titles').textContent = top && top.timesPicked ? t('mostPicked', { name: top.name, count: top.timesPicked }) : '';
   }
 }
@@ -812,7 +1020,6 @@ function render() {
   requestAnimationFrame(tick);
 })();
 
-$('rounds').onclick = e => { const r = e.target.dataset.r; if (r) saveSettings({ totalRounds: +r }); };
 // copies the join address, with a textarea fallback where the clipboard api is blocked
 $('inviteLink').onclick = async () => {
   const link = joinUrl();
@@ -840,14 +1047,29 @@ $('inviteLink').onclick = async () => {
     $('shareStatus').textContent = '';
   }, 1600);
 };
-$('gameSettings').onclick = () => { setGamePanelView('settings'); $('backToGames').focus(); };
-$('backToGames').onclick = () => { setGamePanelView('choose'); $('gameSettings').focus(); };
 $('gameModes').onclick = e => { const mode = e.target.closest('[data-mode]')?.dataset.mode; if (mode) saveSettings({ mode }); };
-$('anon').onchange = e => saveSettings({ anonymous: e.target.checked });
 $('start').onclick = $('skip').onclick = $('next').onclick = $('again').onclick = $('sketchAdvance').onclick = advance;
+DubHost.init({ $, api, locale, room });
+CrowdUi.initHost({ $, api, locale, state: () => S });
+QuizUi.initHost({ $, api, locale, state: () => S });
+DuelUi.initHost({ $, api, locale, state: () => S });
+FakeUi.initHost({ $, api, locale, state: () => S });
+document.querySelectorAll('[data-fake]').forEach(element => { element.textContent = FakeUi.t(locale, element.dataset.fake); });
+TelephoneUi.initHost({ $, api, locale, state: () => S });
+DictationUi.initHost({ $, api, locale, state: () => S });
+document.querySelectorAll('[data-dictation]').forEach(element => { element.textContent = DictationUi.t(locale, element.dataset.dictation); });
+document.querySelectorAll('[data-telephone]').forEach(element => { element.textContent = TelephoneUi.t(locale, element.dataset.telephone); });
+ShowUi.initHost({ $, api, locale, state: () => S });
+document.querySelectorAll('[data-show]').forEach(element => { element.textContent = ShowUi.t(locale, element.dataset.show); });
+ImpostorUi.initHost({ $, api, locale, state: () => S });
+document.querySelectorAll('[data-impostor]').forEach(element => { element.textContent = ImpostorUi.t(locale, element.dataset.impostor); });
+TowerUi.initHost({ $, api, locale, state: () => S });
+document.querySelectorAll('[data-tower]').forEach(element => { element.textContent = TowerUi.t(locale, element.dataset.tower); });
+MonsterUi.initHost({ $, api, locale, state: () => S });
+document.querySelectorAll('[data-monster]').forEach(element => { element.textContent = MonsterUi.t(locale, element.dataset.monster); });
 document.addEventListener('keydown', e => {
   if (e.repeat) return;
-  if ((e.code === 'Space' || e.code === 'Enter') && !e.target.closest('button, input')) { e.preventDefault(); advance(); }
+  if ((e.code === 'Space' || e.code === 'Enter') && !e.target.closest('button, input')) { e.preventDefault(); if (S?.phase === 'dub') DubHost.primary(); else advance(); }
   if (e.code === 'KeyF') document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
 });
 </script>

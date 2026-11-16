@@ -8,4 +8,13 @@
   <symbol id="check" viewBox="0 0 24 24">
     <path d="m5 12 4 4L19 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
   </symbol>
+  <symbol id="mic" viewBox="0 0 24 24">
+    <path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3ZM5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3m-3.5 0h7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+  <symbol id="stop" viewBox="0 0 24 24">
+    <rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/>
+  </symbol>
+  <symbol id="play" viewBox="0 0 24 24">
+    <path d="M8 5.5v13l10.5-6.5Z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+  </symbol>
 </svg>
