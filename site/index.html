@@ -21,7 +21,7 @@
     .entry-card.player { background: var(--player-face); color: #fff; }
     .entry-card.host { background: var(--host-face); color: var(--host-text); }
   </style>
-  <link rel="stylesheet" href="styles.css?v=47">
+  <link rel="stylesheet" href="styles.css?v=72">
   <script src="motion.js?v=7" defer></script>
   <script src="mascot.js?v=4" defer></script>
 </head>
@@ -286,11 +286,15 @@
   </main>
 
   <dialog class="game-dialog" id="gameDialog" aria-label="Игровое окно">
+    <button class="game-dialog-close" type="button" aria-label="Close game">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+    </button>
+    <button class="game-dialog-handle" type="button" aria-label="Изменить высоту игрового окна" aria-expanded="false" hidden><span></span></button>
     <iframe class="game-dialog-frame" src="about:blank" title="Игровое окно" allow="fullscreen; clipboard-write"></iframe>
   </dialog>
 
   <script src="language.js?v=6"></script>
   <script src="local-preview.js?v=2"></script>
-  <script src="game-dialog.js?v=8"></script>
+  <script src="game-dialog.js?v=25"></script>
 </body>
 </html>
